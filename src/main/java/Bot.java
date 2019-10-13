@@ -24,6 +24,48 @@ public class Bot extends TelegramLongPollingBot {
         return result.toString();
     }
 
+    public static String SeekFly(String[] oddr)
+    {
+        if (oddr.length > 3 && oddr.length < 6){
+            String token = "5d146c60846217f62771c7faaddbff4b";
+            String origin = "";
+            String destination = "";
+            String depart_date = "";
+            String return_date = "";
+            String currency = "RUB";
+            try {
+                origin = oddr[0];
+                destination = oddr[1];
+                depart_date = oddr[2];
+                return_date = oddr[3];
+                if (oddr.length == 5)
+                {
+                    currency = oddr[4];
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "fail";
+            }
+            String url = "http://api.travelpayouts.com/v1/prices/cheap?" +
+                    "origin=" + origin +
+                    "&destination=" + destination +
+                    "&depart_date=" + depart_date +
+                    "&return_date=" + return_date +
+                    "&token=" + token +
+                    "&currency=" + currency;
+            String request = "";
+            try {
+                request = getHTML(url);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "fail";
+            }
+            return request;
+        }
+        return "fail";
+    }
+
     @Override
     public String getBotToken() {
         return "882526722:AAHk_SAlTXS2eM6B6uGgWapn3fRWizpndUc";
@@ -32,28 +74,34 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         try {
-            String token = "5d146c60846217f62771c7faaddbff4b";
-            String origin = "MOW";
+            /*String origin = "MOW";
             String destination = "JFK";
             String depart_date = "2019-11";
-            String return_date = "2019-12";
-            String url = "http://api.travelpayouts.com/v1/prices/cheap?" +
-                    "origin=" + origin +
-                    "&destination=" + destination +
-                    "&depart_date=" + depart_date +
-                    "&return_date=" + return_date +
-                    "&token=" + token;
-            HttpGet request = new HttpGet(url);
+            String return_date = "2019-12";*/
             if (update.hasMessage() && update.getMessage().hasText()) {
                 Message inMessage = update.getMessage();
                 SendMessage outMessage = new SendMessage();
                 outMessage.setChatId(inMessage.getChatId());
-                try {
-                    outMessage.setText(getHTML(url));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                String[] oddr = inMessage.getText().split(" ");
+                if (inMessage.getText().equals("/help"))
+                {
+                    outMessage.setText("help_string");
+                    execute(outMessage);
                 }
-                execute(outMessage);
+                else if (inMessage.getText().equals("/setting"))
+                {
+                    outMessage.setText("setting_string");
+                    execute(outMessage);
+                }
+                else
+                {
+                    try {
+                        outMessage.setText(SeekFly(oddr));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    execute(outMessage);
+                }
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
