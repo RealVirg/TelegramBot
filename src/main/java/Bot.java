@@ -74,10 +74,6 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         try {
-            /*String origin = "MOW";
-            String destination = "JFK";
-            String depart_date = "2019-11";
-            String return_date = "2019-12";*/
             if (update.hasMessage() && update.getMessage().hasText()) {
                 Message inMessage = update.getMessage();
                 SendMessage outMessage = new SendMessage();
@@ -85,14 +81,17 @@ public class Bot extends TelegramLongPollingBot {
                 String[] oddr = inMessage.getText().split(" ");
                 if (inMessage.getText().equals("/help"))
                 {
-                    outMessage.setText("help_string");
+                    outMessage.setText("Bot to seek for cheap flights.\n" +
+                            "Request to bot: IATA-code origin, IATA-code destination," +
+                            " depart date(YYYY-MM), return date(YYYY-MM), currency(RUB/USD/EUR).\n" +
+                            "Example: SVX MOW 2020-01 2020-02.");
                     execute(outMessage);
                 }
-                else if (inMessage.getText().equals("/setting"))
+                /*else if (inMessage.getText().equals("/setting"))
                 {
                     outMessage.setText("setting_string");
                     execute(outMessage);
-                }
+                }*/
                 else
                 {
                     try {
