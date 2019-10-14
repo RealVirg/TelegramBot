@@ -1,4 +1,4 @@
-import org.apache.http.client.methods.HttpGet;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonObjectFormatVisitor;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -6,6 +6,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.*;
 import java.net.*;
+
+import org.json.*;
+
 
 
 public class Bot extends TelegramLongPollingBot {
@@ -22,6 +25,48 @@ public class Bot extends TelegramLongPollingBot {
         }
         rd.close();
         return result.toString();
+    }
+
+    public static String makeRequest(Integer lowestPrice, String lowestPriceAirline,
+                                     Integer lowestPriceFlightNumber, String lowestPriceDepartureAt,
+                                     String lowestPriceReturnAt, String lowestPriceExpiresAt,
+                                     String lowestPriceCurrency)
+    {
+        String result;
+        result = "Price: " + lowestPrice + " " + lowestPriceCurrency + "\n" +
+                "Airline: " + lowestPriceAirline + "\n" +
+                "FlightNumber: " + lowestPriceFlightNumber + "\n" +
+                "Departure at: " + lowestPriceDepartureAt + "\n" +
+                "Return at: " + lowestPriceReturnAt + "\n" +
+                "Expires at: " + lowestPriceExpiresAt + "\n";
+        return result;
+    }
+
+    public static String JsonParser(String stringForParse, String destination){
+       JSONObject jsonObject  = new JSONObject(stringForParse);
+       boolean success = jsonObject.getBoolean("success");
+       Object temp = jsonObject.get("data");
+       JSONObject jsonObject_1 = new JSONObject(temp.toString());
+       try {
+           Object temp_1 = jsonObject_1.get(destination);
+           JSONObject jsonObject_2 = new JSONObject(temp_1.toString());
+           Object temp_2 = jsonObject_2.get("0");
+           JSONObject jsonObject_3 = new JSONObject(temp_2.toString());
+           Integer lowestPrice = jsonObject_3.getInt("price");
+           String lowestPriceAirline = jsonObject_3.getString("airline");
+           Integer lowestPriceFlightNumber = jsonObject_3.getInt("flight_number");
+           String lowestPriceDepartureAt = jsonObject_3.getString("departure_at");
+           String lowestPriceReturnAt = jsonObject_3.getString("return_at");
+           String lowestPriceExpiresAt = jsonObject_3.getString("expires_at");
+           String lowestPriceCurrency = jsonObject.getString("currency");
+           return makeRequest(lowestPrice, lowestPriceAirline,
+                   lowestPriceFlightNumber, lowestPriceDepartureAt,
+                   lowestPriceReturnAt, lowestPriceExpiresAt,
+                   lowestPriceCurrency);
+       } catch (Exception e){
+           e.printStackTrace();
+           return "No flight";
+       }
     }
 
     public static String SeekFly(String[] oddr)
@@ -45,7 +90,7 @@ public class Bot extends TelegramLongPollingBot {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                return "fail";
+                return "/help";
             }
             String url = "http://api.travelpayouts.com/v1/prices/cheap?" +
                     "origin=" + origin +
@@ -56,14 +101,14 @@ public class Bot extends TelegramLongPollingBot {
                     "&currency=" + currency;
             String request = "";
             try {
-                request = getHTML(url);
+                request = JsonParser(getHTML(url), destination).toString();
             } catch (Exception e) {
                 e.printStackTrace();
-                return "fail";
+                return "/help";
             }
             return request;
         }
-        return "fail";
+        return "/help";
     }
 
     @Override
@@ -87,7 +132,12 @@ public class Bot extends TelegramLongPollingBot {
                             "Example: SVX MOW 2020-01 2020-02.");
                     execute(outMessage);
                 }
-                /*else if (inMessage.getText().equals("/setting"))
+                /*else if (inMessage.getText().equals("SVX MOW 2020-01 2020-02"))
+                {
+                    outMessage.setText(JsonParser(SeekFly(oddr)).toString());
+                    execute(outMessage);
+                }
+                else if (inMessage.getText().equals("/setting"))
                 {
                     outMessage.setText("setting_string");
                     execute(outMessage);
