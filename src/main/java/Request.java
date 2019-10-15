@@ -110,7 +110,8 @@ public class Request {
                 "FlightNumber: " + lowestPriceFlightNumber + "\n" +
                 "Departure at: " + lowestPriceDepartureAt + "\n" +
                 "Return at: " + lowestPriceReturnAt + "\n" +
-                "Expires at: " + lowestPriceExpiresAt + "\n";
+                "Expires at: " + lowestPriceExpiresAt + "\n" +
+                "http://pics.avs.io/200/200/" + lowestPriceAirline + ".png";
         request = result;
     }
 }
