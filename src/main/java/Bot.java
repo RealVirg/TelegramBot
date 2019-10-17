@@ -130,11 +130,15 @@ public class Bot extends TelegramLongPollingBot {
                     outMessage.setText("Bot to seek for cheap flights.\n" +
                             "Request to bot: IATA-code origin, IATA-code destination," +
                             " depart date(YYYY-MM), return date(YYYY-MM), currency(RUB/USD/EUR).\n" +
-                            "Example: SVX MOW 2020-01 2020-02.");
+                            "Example: SVX MOW 2020-01 2020-02.\n" +
+                            "Commands: \n" + "/help\n/getMeIATACodeList\n");
                     execute(outMessage);
                 }
-                else
-                {
+                else if (inMessage.getText().equals("/getMeIATACodeList")) {
+                    outMessage.setText("https://en.wikipedia.org/wiki/IATA_airport_code");
+                    execute(outMessage);
+                }
+                else {
                     try {
 //                        outMessage.setText(SeekFly(oddr));
                         Request r = new Request(oddr);
