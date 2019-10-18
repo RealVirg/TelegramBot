@@ -131,7 +131,7 @@ public class Bot extends TelegramLongPollingBot {
                             "Request to bot: IATA-code origin, IATA-code destination," +
                             " depart date(YYYY-MM), return date(YYYY-MM), currency(RUB/USD/EUR).\n" +
                             "Example: SVX MOW 2020-01 2020-02.\n" +
-                            "Commands: \n" + "/help\n/getMeIATACodeList\n");
+                            "Commands: \n" + "/help\n/whatIsIATACode\n");
                     execute(outMessage);
                 }
                 else if (inMessage.getText().equals("/whatIsIATACode")) {
