@@ -134,7 +134,7 @@ public class Bot extends TelegramLongPollingBot {
                             "Commands: \n" + "/help\n/getMeIATACodeList\n");
                     execute(outMessage);
                 }
-                else if (inMessage.getText().equals("/getMeIATACodeList")) {
+                else if (inMessage.getText().equals("/whatIsIATACode")) {
                     outMessage.setText("https://en.wikipedia.org/wiki/IATA_airport_code");
                     execute(outMessage);
                 }
