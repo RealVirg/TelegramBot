@@ -29,9 +29,16 @@ public class Request {
         return result.toString();
     }
 
-    public void SeekFly()
+    public void SeekCheapestFlight()
     {
-        if (input.length > 3 && input.length < 6){
+        if (input.length == 5 || input.length == 6 || input.length == 4){
+            boolean withoutReturnDate = false;
+            if (input[input.length - 1].equals("RUB") ||
+                    input[input.length - 1].equals("EUR") ||
+                    input[input.length - 1].equals("USD") ||
+                    input.length == 4) {
+                withoutReturnDate = true;
+            }
             String token = "5d146c60846217f62771c7faaddbff4b";
             String origin = "";
             String destination = "";
@@ -39,29 +46,53 @@ public class Request {
             String return_date = "";
             String currency = "RUB";
             try {
-                origin = input[0];
-                destination = input[1];
-                des = destination;
-                depart_date = input[2];
-                return_date = input[3];
-                if (input.length == 5)
+                if (!withoutReturnDate){
+                    origin = input[1];
+                    destination = input[2];
+                    des = destination;
+                    depart_date = input[3];
+                    return_date = input[4];
+                    if (input.length == 6)
+                    {
+                        currency = input[5];
+                    }
+                }
+                else
                 {
-                    currency = input[4];
+                    origin = input[1];
+                    destination = input[2];
+                    des = destination;
+                    depart_date = input[3];
+                    if (input.length == 5)
+                    {
+                        currency = input[4];
+                    }
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
                 request =  "/help";
             }
-            String url = "http://api.travelpayouts.com/v1/prices/cheap?" +
-                    "origin=" + origin +
-                    "&destination=" + destination +
-                    "&depart_date=" + depart_date +
-                    "&return_date=" + return_date +
-                    "&token=" + token +
-                    "&currency=" + currency;
+            String url = "http://api.travelpayouts.com/v1/prices/cheap?";
+            if (!withoutReturnDate) {
+                url = "http://api.travelpayouts.com/v1/prices/cheap?" +
+                        "origin=" + origin +
+                        "&destination=" + destination +
+                        "&depart_date=" + depart_date +
+                        "&return_date=" + return_date +
+                        "&token=" + token +
+                        "&currency=" + currency;
+            }
+            else {
+                url = "http://api.travelpayouts.com/v1/prices/cheap?" +
+                        "origin=" + origin +
+                        "&destination=" + destination +
+                        "&depart_date=" + depart_date +
+                        "&token=" + token +
+                        "&currency=" + currency;
+            }
             try {
-                this.parserJSON(getHTML(url));
+                this.parserJSONCheapestFlight(getHTML(url));
             } catch (Exception e) {
                 e.printStackTrace();
                 request =  "/help";
@@ -73,7 +104,7 @@ public class Request {
         }
     }
 
-    public void parserJSON(String something) {
+    public void parserJSONCheapestFlight(String something) {
         JSONObject jsonObject = new JSONObject(something);
         boolean success = jsonObject.getBoolean("success");
         Object temp = jsonObject.get("data");
@@ -90,7 +121,7 @@ public class Request {
             String lowestPriceReturnAt = jsonObject_3.getString("return_at");
             String lowestPriceExpiresAt = jsonObject_3.getString("expires_at");
             String lowestPriceCurrency = jsonObject.getString("currency");
-            this.makeRequest(lowestPrice, lowestPriceAirline,
+            this.makeRequestCheapest(lowestPrice, lowestPriceAirline,
                     lowestPriceFlightNumber, lowestPriceDepartureAt,
                     lowestPriceReturnAt, lowestPriceExpiresAt,
                     lowestPriceCurrency);
@@ -100,7 +131,7 @@ public class Request {
         }
     }
 
-    public void makeRequest(Integer lowestPrice, String lowestPriceAirline,
+    public void makeRequestCheapest(Integer lowestPrice, String lowestPriceAirline,
                               Integer lowestPriceFlightNumber, String lowestPriceDepartureAt,
                               String lowestPriceReturnAt, String lowestPriceExpiresAt,
                               String lowestPriceCurrency) {

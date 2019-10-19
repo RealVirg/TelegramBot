@@ -127,27 +127,41 @@ public class Bot extends TelegramLongPollingBot {
                 String[] oddr = inMessage.getText().split(" ");
                 if (inMessage.getText().equals("/help"))
                 {
-                    outMessage.setText("Bot to seek for cheap flights.\n" +
-                            "Request to bot: IATA-code origin, IATA-code destination," +
-                            " depart date(YYYY-MM), return date(YYYY-MM), currency(RUB/USD/EUR).\n" +
-                            "Example: SVX MOW 2020-01 2020-02.\n" +
-                            "Commands: \n" + "/help\n/whatIsIATACode\n");
+                    outMessage.setText("Bot to seek for cheap flights.\n"+
+                            "Commands: \n" + "/help\n/whatIsIATACode\n/seekCheapestFlight");
                     execute(outMessage);
                 }
                 else if (inMessage.getText().equals("/whatIsIATACode")) {
                     outMessage.setText("https://en.wikipedia.org/wiki/IATA_airport_code");
                     execute(outMessage);
                 }
-                else {
+                else if (inMessage.getText().equals("/seekCheapestFlight"))
+                {
+                    outMessage.setText("Seek cheapest flight in month.\nExample: " +
+                            "/seekCheapestFlight SVX MOW 2020-01 2020-02.");
+                    execute(outMessage);
+                }
+                else if (oddr[0].equals("/seekCheapestFlight"))
+                {
                     try {
 //                        outMessage.setText(SeekFly(oddr));
                         Request r = new Request(oddr);
-                        r.SeekFly();
+                        r.SeekCheapestFlight();
                         outMessage.setText(r.request);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     execute(outMessage);
+                }
+                else {
+//                    try {
+//                        Request r = new Request(oddr);
+//                        r.SeekFly();
+//                        outMessage.setText(r.request);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    execute(outMessage);
                 }
             }
         } catch (TelegramApiException e) {
