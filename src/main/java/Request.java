@@ -73,9 +73,9 @@ public class Request {
                 e.printStackTrace();
                 request =  "/help";
             }
-            String url = "http://api.travelpayouts.com/v1/prices/cheap?";
+            String url;
             if (!withoutReturnDate) {
-                url = "http://api.travelpayouts.com/v1/prices/cheap?" +
+                url = "http://api.travelpayouts.com/v1/prices/direct?" +
                         "origin=" + origin +
                         "&destination=" + destination +
                         "&depart_date=" + depart_date +
@@ -84,7 +84,7 @@ public class Request {
                         "&currency=" + currency;
             }
             else {
-                url = "http://api.travelpayouts.com/v1/prices/cheap?" +
+                url = "http://api.travelpayouts.com/v1/prices/direct?" +
                         "origin=" + origin +
                         "&destination=" + destination +
                         "&depart_date=" + depart_date +
