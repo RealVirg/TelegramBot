@@ -8,104 +8,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class Bot extends TelegramLongPollingBot {
 
-//    public static String getHTML(String urlToRead) throws Exception {
-//        StringBuilder result = new StringBuilder();
-//        URL url = new URL(urlToRead);
-//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//        conn.setRequestMethod("GET");
-//        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//        String line;
-//        while ((line = rd.readLine()) != null) {
-//            result.append(line);
-//        }
-//        rd.close();
-//        return result.toString();
-//    }
-//
-//    public static String makeRequest(Integer lowestPrice, String lowestPriceAirline,
-//                                     Integer lowestPriceFlightNumber, String lowestPriceDepartureAt,
-//                                     String lowestPriceReturnAt, String lowestPriceExpiresAt,
-//                                     String lowestPriceCurrency)
-//    {
-//        String result;
-//        result = "Price: " + lowestPrice + " " + lowestPriceCurrency + "\n" +
-//                "Airline: " + lowestPriceAirline + "\n" +
-//                "FlightNumber: " + lowestPriceFlightNumber + "\n" +
-//                "Departure at: " + lowestPriceDepartureAt + "\n" +
-//                "Return at: " + lowestPriceReturnAt + "\n" +
-//                "Expires at: " + lowestPriceExpiresAt + "\n";
-//        return result;
-//    }
-//
-//    public static String JsonParser(String stringForParse, String destination){
-//       JSONObject jsonObject  = new JSONObject(stringForParse);
-//       boolean success = jsonObject.getBoolean("success");
-//       Object temp = jsonObject.get("data");
-//       JSONObject jsonObject_1 = new JSONObject(temp.toString());
-//       try {
-//           Object temp_1 = jsonObject_1.get(destination);
-//           JSONObject jsonObject_2 = new JSONObject(temp_1.toString());
-//           Object temp_2 = jsonObject_2.get("0");
-//           JSONObject jsonObject_3 = new JSONObject(temp_2.toString());
-//           Integer lowestPrice = jsonObject_3.getInt("price");
-//           String lowestPriceAirline = jsonObject_3.getString("airline");
-//           Integer lowestPriceFlightNumber = jsonObject_3.getInt("flight_number");
-//           String lowestPriceDepartureAt = jsonObject_3.getString("departure_at");
-//           String lowestPriceReturnAt = jsonObject_3.getString("return_at");
-//           String lowestPriceExpiresAt = jsonObject_3.getString("expires_at");
-//           String lowestPriceCurrency = jsonObject.getString("currency");
-//           return makeRequest(lowestPrice, lowestPriceAirline,
-//                   lowestPriceFlightNumber, lowestPriceDepartureAt,
-//                   lowestPriceReturnAt, lowestPriceExpiresAt,
-//                   lowestPriceCurrency);
-//       } catch (Exception e){
-//           e.printStackTrace();
-//           return "No flight";
-//       }
-//    }
-//
-//    public static String SeekFly(String[] oddr)
-//    {
-//        if (oddr.length > 3 && oddr.length < 6){
-//            String token = "5d146c60846217f62771c7faaddbff4b";
-//            String origin = "";
-//            String destination = "";
-//            String depart_date = "";
-//            String return_date = "";
-//            String currency = "RUB";
-//            try {
-//                origin = oddr[0];
-//                destination = oddr[1];
-//                depart_date = oddr[2];
-//                return_date = oddr[3];
-//                if (oddr.length == 5)
-//                {
-//                    currency = oddr[4];
-//                }
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return "/help";
-//            }
-//            String url = "http://api.travelpayouts.com/v1/prices/cheap?" +
-//                    "origin=" + origin +
-//                    "&destination=" + destination +
-//                    "&depart_date=" + depart_date +
-//                    "&return_date=" + return_date +
-//                    "&token=" + token +
-//                    "&currency=" + currency;
-//            String request = "";
-//            try {
-//                request = JsonParser(getHTML(url), destination).toString();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return "/help";
-//            }
-//            return request;
-//        }
-//        return "/help";
-//    }
-
     @Override
     public String getBotToken() {
         return "882526722:AAHk_SAlTXS2eM6B6uGgWapn3fRWizpndUc";
@@ -133,8 +35,17 @@ public class Bot extends TelegramLongPollingBot {
                 }
                 else if (inMessage.getText().equals("/seekCheapestFlight"))
                 {
-                    outMessage.setText("Seek cheapest flight in month.\nExample: " +
-                            "/seekCheapestFlight SVX MOW 2020-01 2020-02.");
+                    outMessage.setText("Seek cheapest flight in selected date.\n" +
+                            "First origin in format IATA-code,\n" +
+                            "second destination in format IATA-code,\n" +
+                            "third depart date in format YYYY-MM, \n" +
+                            "fourth return date in format YYYY-MM(optional),\n" +
+                            "fifth currency(you can choose from USD, EUR, RUB(standard), optional).\n" +
+                            "Example:\n" +
+                            "/seekCheapestFlight SVX MOW 2020-01 2020-02\n" +
+                            "/seekCheapestFlight SVX MOW 2020-01 2020-02 EUR\n" +
+                            "/seekCheapestFlight SVX MOW 2020-01\n" +
+                            "/seekCheapestFlight SVX MOW 2020-01 USD\n");
                     execute(outMessage);
                 }
                 else if (oddr[0].equals("/seekCheapestFlight"))

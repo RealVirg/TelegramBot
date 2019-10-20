@@ -10,8 +10,10 @@ public class Request {
     public String[] input;
     public String des;
     public String reply;
-    public String wrongInput = "wrongInput";
-    public String notFound = "notFound";
+    public String wrongInput = "Please, can you write your request right?\n" +
+            "If you don't know how, you can use /seekCheapestFlight for check some example or read a documentation.";
+    public String notFound = "Sorry, but there are no results for your search.\n" +
+            "Check your input information. Maybe you entered the wrong date?";
 
     Request(String[] st) {
         input = st;
