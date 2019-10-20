@@ -33,9 +33,9 @@ public class Request {
     {
         if (input.length == 5 || input.length == 6 || input.length == 4){
             boolean withoutReturnDate = false;
-            if (input[input.length - 1].equals("RUB") ||
+            if (((input[input.length - 1].equals("RUB") ||
                     input[input.length - 1].equals("EUR") ||
-                    input[input.length - 1].equals("USD") ||
+                    input[input.length - 1].equals("USD")) && input.length == 5) ||
                     input.length == 4) {
                 withoutReturnDate = true;
             }
@@ -121,10 +121,13 @@ public class Request {
             String lowestPriceReturnAt = jsonObject_3.getString("return_at");
             String lowestPriceExpiresAt = jsonObject_3.getString("expires_at");
             String lowestPriceCurrency = jsonObject.getString("currency");
-            this.makeRequestCheapest(lowestPrice, lowestPriceAirline,
-                    lowestPriceFlightNumber, lowestPriceDepartureAt,
-                    lowestPriceReturnAt, lowestPriceExpiresAt,
-                    lowestPriceCurrency);
+            request = "Price: " + lowestPrice + " " + lowestPriceCurrency + "\n" +
+                    "Airline: " + lowestPriceAirline + "\n" +
+                    "FlightNumber: " + lowestPriceFlightNumber + "\n" +
+                    "Departure at: " + lowestPriceDepartureAt + "\n" +
+                    "Return at: " + lowestPriceReturnAt + "\n" +
+                    "Expires at: " + lowestPriceExpiresAt + "\n" +
+                    "http://pics.avs.io/200/200/" + lowestPriceAirline + ".png";
         } catch (Exception e) {
             e.printStackTrace();
             request =  "No flight";
@@ -135,14 +138,6 @@ public class Request {
                               Integer lowestPriceFlightNumber, String lowestPriceDepartureAt,
                               String lowestPriceReturnAt, String lowestPriceExpiresAt,
                               String lowestPriceCurrency) {
-        String result;
-        result = "Price: " + lowestPrice + " " + lowestPriceCurrency + "\n" +
-                "Airline: " + lowestPriceAirline + "\n" +
-                "FlightNumber: " + lowestPriceFlightNumber + "\n" +
-                "Departure at: " + lowestPriceDepartureAt + "\n" +
-                "Return at: " + lowestPriceReturnAt + "\n" +
-                "Expires at: " + lowestPriceExpiresAt + "\n" +
-                "http://pics.avs.io/200/200/" + lowestPriceAirline + ".png";
-        request = result;
+
     }
 }
