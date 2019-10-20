@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Connection;
 
 public class Request {
     public String[] input;
     public String des;
-    public String request;
+    public String reply;
+    public String wrongInput = "wrongInput";
+    public String notFound = "notFound";
 
     Request(String[] st) {
         input = st;
@@ -29,7 +32,7 @@ public class Request {
         return result.toString();
     }
 
-    public void SeekCheapestFlight()
+    public void SeekCheapestFlight(SqliteDB conn)
     {
         if (input.length == 5 || input.length == 6 || input.length == 4){
             boolean withoutReturnDate = false;
@@ -71,7 +74,7 @@ public class Request {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                request =  "/help";
+                reply = wrongInput;
             }
             String url;
             if (!withoutReturnDate) {
@@ -95,12 +98,33 @@ public class Request {
                 this.parserJSONCheapestFlight(getHTML(url));
             } catch (Exception e) {
                 e.printStackTrace();
-                request =  "/help";
+                reply = wrongInput;
             }
+            int code_replay;
+            String full_request = "";
+            for (int i = 0; i < input.length; i++)
+            {
+                full_request += input[i];
+                full_request += " ";
+            }
+            if (reply.equals(wrongInput))
+                code_replay = -1;
+            else if (reply.equals(notFound))
+                code_replay = 0;
+            else
+                code_replay = 1;
+            conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
         }
         else
         {
-            request = "/help";
+            reply = wrongInput;
+            String full_request = "";
+            for (int i = 0; i < input.length; i++)
+            {
+                full_request += input[i];
+                full_request += " ";
+            }
+            conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
         }
     }
 
@@ -114,14 +138,14 @@ public class Request {
             JSONObject jsonObject_2 = new JSONObject(temp_1.toString());
             Object temp_2 = jsonObject_2.get("0");
             JSONObject jsonObject_3 = new JSONObject(temp_2.toString());
-            Integer lowestPrice = jsonObject_3.getInt("price");
+            int lowestPrice = jsonObject_3.getInt("price");
             String lowestPriceAirline = jsonObject_3.getString("airline");
-            Integer lowestPriceFlightNumber = jsonObject_3.getInt("flight_number");
+            int lowestPriceFlightNumber = jsonObject_3.getInt("flight_number");
             String lowestPriceDepartureAt = jsonObject_3.getString("departure_at");
             String lowestPriceReturnAt = jsonObject_3.getString("return_at");
             String lowestPriceExpiresAt = jsonObject_3.getString("expires_at");
             String lowestPriceCurrency = jsonObject.getString("currency");
-            request = "Price: " + lowestPrice + " " + lowestPriceCurrency + "\n" +
+            reply = "Price: " + lowestPrice + " " + lowestPriceCurrency + "\n" +
                     "Airline: " + lowestPriceAirline + "\n" +
                     "FlightNumber: " + lowestPriceFlightNumber + "\n" +
                     "Departure at: " + lowestPriceDepartureAt + "\n" +
@@ -130,14 +154,7 @@ public class Request {
                     "http://pics.avs.io/200/200/" + lowestPriceAirline + ".png";
         } catch (Exception e) {
             e.printStackTrace();
-            request =  "No flight";
+            reply = notFound;
         }
-    }
-
-    public void makeRequestCheapest(Integer lowestPrice, String lowestPriceAirline,
-                              Integer lowestPriceFlightNumber, String lowestPriceDepartureAt,
-                              String lowestPriceReturnAt, String lowestPriceExpiresAt,
-                              String lowestPriceCurrency) {
-
     }
 }

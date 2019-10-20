@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 
+
 public class Bot extends TelegramLongPollingBot {
 
 //    public static String getHTML(String urlToRead) throws Exception {
@@ -115,6 +116,7 @@ public class Bot extends TelegramLongPollingBot {
         try {
             if (update.hasMessage() && update.getMessage().hasText()) {
                 SqliteDB conn = new SqliteDB();
+                conn.CreateLogTableDay();
                 Message inMessage = update.getMessage();
                 SendMessage outMessage = new SendMessage();
                 outMessage.setChatId(inMessage.getChatId());
@@ -140,22 +142,16 @@ public class Bot extends TelegramLongPollingBot {
                     try {
 //                        outMessage.setText(SeekFly(oddr));
                         Request r = new Request(oddr);
-                        r.SeekCheapestFlight();
-                        outMessage.setText(r.request);
+                        r.SeekCheapestFlight(conn);
+                        outMessage.setText(r.reply);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     execute(outMessage);
                 }
                 else {
-//                    try {
-//                        Request r = new Request(oddr);
-//                        r.SeekFly();
-//                        outMessage.setText(r.request);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    execute(outMessage);
+                    outMessage.setText("I can't understand you.\nPlease use /help for check commands.");
+                    execute(outMessage);
                 }
             }
         } catch (TelegramApiException e) {
