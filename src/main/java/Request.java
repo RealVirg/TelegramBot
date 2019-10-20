@@ -113,7 +113,10 @@ public class Request {
                 code_replay = 0;
             else
                 code_replay = 1;
-            conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
+            if (code_replay != -1)
+                conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
+            else
+                conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
         }
         else
         {
