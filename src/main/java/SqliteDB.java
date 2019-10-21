@@ -9,7 +9,6 @@ public class SqliteDB {
         try {
             Class.forName("org.sqlite.JDBC");
             co = DriverManager.getConnection("jdbc:sqlite:db/testDB.db");
-            System.out.println("Connected");
         } catch (Exception e) {
             e.printStackTrace();
         }
