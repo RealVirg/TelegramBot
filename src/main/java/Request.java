@@ -10,14 +10,16 @@ public class Request {
     public String[] input;
     public String des;
     public String reply;
+    public String request_url;
     public String wrongInput = "Please, can you write your request right?\n" +
             "If you don't know how, you can use /seekCheapestFlight for check some example or read a documentation.";
     public String notFound = "Sorry, but there are no results for your search.\n" +
             "Check your input information. Maybe you entered the wrong date?";
 
-    Request(String[] st) {
+    Request(String[] st, String url) {
         input = st;
         des = "";
+        request_url = url;
     }
 
     public String getHTML(String urlToRead) throws Exception {
@@ -80,7 +82,7 @@ public class Request {
             }
             String url;
             if (!withoutReturnDate) {
-                url = "http://api.travelpayouts.com/v1/prices/direct?" +
+                url = request_url +
                         "origin=" + origin +
                         "&destination=" + destination +
                         "&depart_date=" + depart_date +
@@ -89,7 +91,7 @@ public class Request {
                         "&currency=" + currency;
             }
             else {
-                url = "http://api.travelpayouts.com/v1/prices/direct?" +
+                url = request_url +
                         "origin=" + origin +
                         "&destination=" + destination +
                         "&depart_date=" + depart_date +
