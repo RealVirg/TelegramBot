@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Connection;
+import java.util.ArrayList;
 
 public class Request {
     public String[] input;
@@ -22,7 +22,7 @@ public class Request {
         request_url = url;
     }
 
-    public String getHTML(String urlToRead) throws Exception {
+    public String getHTTP(String urlToRead) throws Exception {
         StringBuilder result = new StringBuilder();
         URL url = new URL(urlToRead);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -36,7 +36,7 @@ public class Request {
         return result.toString();
     }
 
-    public void SeekCheapestFlight(SqliteDB conn)
+    public void FindCheapestFlight(SqliteDB conn)
     {
         if (input.length == 5 || input.length == 6 || input.length == 4){
             boolean withoutReturnDate = false;
@@ -99,7 +99,7 @@ public class Request {
                         "&currency=" + currency;
             }
             try {
-                this.parserJSONCheapestFlight(getHTML(url));
+                this.parserJSONCheapestFlight(getHTTP(url));
             } catch (Exception e) {
                 e.printStackTrace();
                 reply = wrongInput;
@@ -135,11 +135,12 @@ public class Request {
         }
     }
 
-    public void parserJSONCheapestFlight(String something) {
-        JSONObject jsonObject = new JSONObject(something);
+    public void parserJSONCheapestFlight(String jsonCode) {
+        JSONObject jsonObject = new JSONObject(jsonCode);
         boolean success = jsonObject.getBoolean("success");
         Object temp = jsonObject.get("data");
         JSONObject jsonObject_1 = new JSONObject(temp.toString());
+
         try {
             Object temp_1 = jsonObject_1.get(des);
             JSONObject jsonObject_2 = new JSONObject(temp_1.toString());
@@ -152,6 +153,7 @@ public class Request {
             String lowestPriceReturnAt = jsonObject_3.getString("return_at");
             String lowestPriceExpiresAt = jsonObject_3.getString("expires_at");
             String lowestPriceCurrency = jsonObject.getString("currency");
+
             reply = "Price: " + lowestPrice + " " + lowestPriceCurrency + "\n" +
                     "Airline: " + lowestPriceAirline + "\n" +
                     "FlightNumber: " + lowestPriceFlightNumber + "\n" +
