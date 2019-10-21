@@ -52,7 +52,7 @@ public class Bot extends TelegramLongPollingBot {
                     try {
 //                        outMessage.setText(SeekFly(oddr));
                         Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
-                        r.FindCheapestFlight(conn);
+                        r.seekCheapestFlight(conn);
                         outMessage.setText(r.reply);
                     } catch (Exception e) {
                         e.printStackTrace();

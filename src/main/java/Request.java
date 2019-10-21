@@ -36,7 +36,7 @@ public class Request {
         return result.toString();
     }
 
-    public void FindCheapestFlight(SqliteDB conn)
+    public void seekCheapestFlight(SqliteDB conn)
     {
         if (input.length == 5 || input.length == 6 || input.length == 4){
             boolean withoutReturnDate = false;
