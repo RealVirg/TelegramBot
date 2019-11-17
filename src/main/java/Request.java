@@ -36,7 +36,7 @@ public class Request {
         return result.toString();
     }
 
-    public void seekCheapestFlight(SqliteDB conn)
+    public void seekCheapestFlight(SqliteDB conn, boolean flag)
     {
         if (input.length == 5 || input.length == 6 || input.length == 4){
             boolean withoutReturnDate = false;
@@ -104,34 +104,36 @@ public class Request {
                 e.printStackTrace();
                 reply = wrongInput;
             }
-            int code_replay;
-            String full_request = "";
-            for (int i = 0; i < input.length; i++)
-            {
-                full_request += input[i];
-                full_request += " ";
+            if (flag) {
+                int code_replay;
+                String full_request = "";
+                for (int i = 0; i < input.length; i++) {
+                    full_request += input[i];
+                    full_request += " ";
+                }
+                if (reply.equals(wrongInput))
+                    code_replay = -1;
+                else if (reply.equals(notFound))
+                    code_replay = 0;
+                else
+                    code_replay = 1;
+                if (code_replay != -1)
+                    conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
+                else
+                    conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
             }
-            if (reply.equals(wrongInput))
-                code_replay = -1;
-            else if (reply.equals(notFound))
-                code_replay = 0;
-            else
-                code_replay = 1;
-            if (code_replay != -1)
-                conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
-            else
-                conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
         }
         else
         {
             reply = wrongInput;
-            String full_request = "";
-            for (int i = 0; i < input.length; i++)
-            {
-                full_request += input[i];
-                full_request += " ";
+            if (flag) {
+                String full_request = "";
+                for (int i = 0; i < input.length; i++) {
+                    full_request += input[i];
+                    full_request += " ";
+                }
+                conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
             }
-            conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
         }
     }
 

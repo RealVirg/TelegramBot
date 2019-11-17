@@ -52,18 +52,11 @@ public class Bot extends TelegramLongPollingBot {
                     try {
 //                        outMessage.setText(SeekFly(oddr));
                         Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
-                        r.seekCheapestFlight(conn);
+                        r.seekCheapestFlight(conn, true);
                         outMessage.setText(r.reply);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    execute(outMessage);
-                }
-
-                else if (inMessage.getText().equals("/tinyAirlines"))
-                {
-                    outMessage.setText("Congratulations! You have found hidden pool, glhf!" + "\n" +
-                            "https://avatars.mds.yandex.net/get-zen_doc/163667/pub_5d03bdf33ad2340d4ce51cb3_5d03d2b4c030570d6780187d/scale_1200");
                     execute(outMessage);
                 }
 

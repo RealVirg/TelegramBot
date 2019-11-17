@@ -20,11 +20,28 @@ class RequestTest {
     @org.junit.jupiter.api.Test
     void testSeekCheapestFlight()
     {
-        Request req = new Request(new String[] { "" }, "");
+        Request req = new Request(new String[] { "/seekCheapestFlight", "SVX", "MOW", "2000-01" }, "http://api.travelpayouts.com/v1/prices/direct?");
 
         SqliteDB connection = new SqliteDB();
 
-        Assert.assertEquals(1,1);
+        req.seekCheapestFlight(connection, false);
+
+        String expected = "Sorry, but there are no results for your search.\n" +
+                "Check your input information. Maybe you entered the wrong date?";
+
+        Assert.assertEquals(expected, req.reply);
+
+        req = new Request(new String[] { "/seekCheapestFlight", "SVX", "MOW", "2000" }, "http://api.travelpayouts.com/v1/prices/direct?");
+
+        connection = new SqliteDB();
+
+        req.seekCheapestFlight(connection, false);
+
+        expected = "Please, can you write your request right?\n" +
+                "If you don't know how, you can use /seekCheapestFlight for check some example or read a documentation.";
+
+        Assert.assertEquals(expected, req.reply);
+
     }
 
     @org.junit.jupiter.api.Test
