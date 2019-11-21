@@ -118,9 +118,14 @@ public class Request {
                 else
                     code_replay = 1;
                 if (code_replay != -1)
+                {
                     conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
-                else
+                    conn.InsertLogLineInTableMonth(origin, destination, depart_date, return_date, currency, code_replay, full_request);
+                }
+                else {
                     conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
+                    conn.InsertLogLineInTableMonth("", "", "", "", "", -1, full_request);
+                }
             }
         }
         else
@@ -133,6 +138,7 @@ public class Request {
                     full_request += " ";
                 }
                 conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
+                conn.InsertLogLineInTableMonth("", "", "", "", "", -1, full_request);
             }
         }
     }

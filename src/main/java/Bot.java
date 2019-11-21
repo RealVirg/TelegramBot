@@ -18,6 +18,7 @@ public class Bot extends TelegramLongPollingBot {
             if (update.hasMessage() && update.getMessage().hasText()) {
                 SqliteDB conn = new SqliteDB();
                 conn.CreateLogTableDay();
+                conn.CreateLogTableMonth();
                 Message inMessage = update.getMessage();
                 SendMessage outMessage = new SendMessage();
                 outMessage.setChatId(inMessage.getChatId());
