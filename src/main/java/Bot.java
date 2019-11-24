@@ -3,7 +3,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
+import java.sql.*;
 
 public class Bot extends TelegramLongPollingBot {
 
@@ -26,7 +26,8 @@ public class Bot extends TelegramLongPollingBot {
                 if (inMessage.getText().equals("/help"))
                 {
                     outMessage.setText("Bot to seek for cheap flights.\n"+
-                            "Commands: \n" + "/help\n/whatIsIATACode\n/seekCheapestFlight");
+                            "Commands: \n" + "/help\n/whatIsIATACode\n/seekCheapestFlight\n"
+                    + "/getCountMonth\n" + "/getCountDay\n" + "/getMostPopularInMonth\n" + "/getMostPopularInDay\n");
                     execute(outMessage);
                 }
                 else if (inMessage.getText().equals("/whatIsIATACode")) {
@@ -60,7 +61,42 @@ public class Bot extends TelegramLongPollingBot {
                     }
                     execute(outMessage);
                 }
-
+                else if (oddr[0].equals("/getCountMonth"))
+                {
+                    try {
+                        outMessage.setText(String.valueOf(conn.GetCountMonth(oddr[1], oddr[2])));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    execute(outMessage);
+                }
+                else if (oddr[0].equals("/getCountDay"))
+                {
+                    try {
+                        outMessage.setText(String.valueOf(conn.GetCountDay(oddr[1], oddr[2])));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    execute(outMessage);
+                }
+                else if (inMessage.getText().equals("/getMostPopularInDay"))
+                {
+                    try {
+                        outMessage.setText(conn.getMostPopularInDay());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    execute(outMessage);
+                }
+                else if (inMessage.getText().equals("/getMostPopularInMonth"))
+                {
+                    try {
+                        outMessage.setText(conn.getMostPopularInMonth());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    execute(outMessage);
+                }
                 else {
                     outMessage.setText("I can't understand you.\nPlease use /help for check commands.");
                     execute(outMessage);

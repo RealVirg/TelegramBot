@@ -1,9 +1,11 @@
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SqliteDB {
-    public Connection co;
+    public Connection co = null;
     public SqliteDB()
     {
         try {
@@ -12,11 +14,6 @@ public class SqliteDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void CreateTableUser(String id)
-    {
-
     }
 
     public void CreateLogTableMonth()
@@ -117,5 +114,98 @@ public class SqliteDB {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int GetCountMonth(String origin, String destination)
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
+        String sql = "SELECT COUNT(*) FROM t" +
+                dateFormat.format(date) + " WHERE origin LIKE '%" +
+                origin + "%' AND destination LIKE '%" + destination + "%'";
+        try {
+            Statement stmt = co.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            return resultSet.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int GetCountDay(String origin, String destination)
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
+        String sql = "SELECT COUNT(*) FROM t" +
+                dateFormat.format(date) + " WHERE origin LIKE '%" +
+                origin + "%' AND destination LIKE '%" + destination + "%'";
+        try {
+            Statement stmt = co.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            return resultSet.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public String getMostPopularInDay()
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
+        String sql = "SELECT destination FROM t" +
+                dateFormat.format(date) + " WHERE code_reply = '1' GROUP BY destination ORDER BY COUNT(destination) DESC";
+        try {
+            Statement stmt = co.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            return resultSet.getString(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (co != null)
+            {
+                try
+                {
+                    co.close();
+                }
+                catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return "ERROR";
+    }
+
+    public String getMostPopularInMonth()
+    {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
+        String sql = "SELECT destination FROM t" +
+                dateFormat.format(date) + " WHERE code_reply = '1' GROUP BY destination ORDER BY COUNT(destination) DESC";
+        try {
+            Statement stmt = co.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            return resultSet.getString(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (co != null)
+            {
+                try
+                {
+                    co.close();
+                }
+                catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return "ERROR";
     }
 }
