@@ -153,12 +153,12 @@ public class SqliteDB {
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
-        String sql = "SELECT destination FROM t" +
-                dateFormat.format(date) + " WHERE code_reply = '1' GROUP BY destination ORDER BY COUNT(destination) DESC";
+        String sql = "SELECT origin, destination FROM t" +
+                dateFormat.format(date) + " WHERE code_reply = '1' GROUP BY origin,destination ORDER BY COUNT(destination) DESC";
         try {
             Statement stmt = co.createStatement();
             ResultSet resultSet = stmt.executeQuery(sql);
-            return resultSet.getString(1);
+            return resultSet.getString(1) + " " + resultSet.getString(2);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -183,12 +183,12 @@ public class SqliteDB {
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
-        String sql = "SELECT destination FROM t" +
-                dateFormat.format(date) + " WHERE code_reply = '1' GROUP BY destination ORDER BY COUNT(destination) DESC";
+        String sql = "SELECT origin, destination FROM t" +
+                dateFormat.format(date) + " WHERE code_reply = '1' GROUP BY origin,destination ORDER BY COUNT(destination) DESC";
         try {
             Statement stmt = co.createStatement();
             ResultSet resultSet = stmt.executeQuery(sql);
-            return resultSet.getString(1);
+            return resultSet.getString(1) + " " + resultSet.getString(2);
         } catch (SQLException e) {
             e.printStackTrace();
         }
