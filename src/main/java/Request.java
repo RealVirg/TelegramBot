@@ -54,8 +54,8 @@ public class Request {
             String currency = "RUB";
             try {
                 if (!withoutReturnDate){
-                    origin = input[1];
-                    destination = input[2];
+                    origin = conn.getCode(input[1]);
+                    destination = conn.getCode(input[2]);
                     des = destination;
                     depart_date = input[3];
                     return_date = input[4];
@@ -66,8 +66,8 @@ public class Request {
                 }
                 else
                 {
-                    origin = input[1];
-                    destination = input[2];
+                    origin = conn.getCode(input[1]);
+                    destination = conn.getCode(input[2]);
                     des = destination;
                     depart_date = input[3];
                     if (input.length == 5)
@@ -79,6 +79,11 @@ public class Request {
             } catch (Exception e) {
                 e.printStackTrace();
                 reply = wrongInput;
+            }
+            if (origin.equals("error") || destination.equals("error"))
+            {
+                reply = wrongInput;
+                return;
             }
             String url;
             if (!withoutReturnDate) {
@@ -139,6 +144,16 @@ public class Request {
                 }
                 conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
                 conn.InsertLogLineInTableMonth("", "", "", "", "", -1, full_request);
+            }
+        }
+        if (conn.co != null)
+        {
+            try {
+                conn.co.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
     }

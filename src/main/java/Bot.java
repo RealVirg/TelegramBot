@@ -77,19 +77,19 @@ public class Bot extends TelegramLongPollingBot {
                     }
                     execute(outMessage);
                 }
-                else if (inMessage.getText().equals("/getMostPopularInDay"))
+                else if (oddr[0].equals("/getMostPopularInDay"))
                 {
                     try {
-                        outMessage.setText(conn.getMostPopularInDay());
+                        outMessage.setText(conn.getMostPopularInDay(oddr[1]));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     execute(outMessage);
                 }
-                else if (inMessage.getText().equals("/getMostPopularInMonth"))
+                else if (oddr[0].equals("/getMostPopularInMonth"))
                 {
                     try {
-                        outMessage.setText(conn.getMostPopularInMonth());
+                        outMessage.setText(conn.getMostPopularInMonth(oddr[1]));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SqliteDB {
-    private Connection co = null;
+    public Connection co = null;
     SqliteDB()
     {
         try {
@@ -119,6 +119,8 @@ public class SqliteDB {
     int GetCountMonth(String origin, String destination)
     {
         Date date = new Date();
+        origin = this.getCode(origin);
+        destination = this.getCode(destination);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
         String sql = "SELECT COUNT(*) FROM t" +
                 dateFormat.format(date) + " WHERE origin LIKE '%" +
@@ -151,6 +153,8 @@ public class SqliteDB {
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
+        origin = this.getCode(origin);
+        destination = this.getCode(destination);
         String sql = "SELECT COUNT(*) FROM t" +
                 dateFormat.format(date) + " WHERE origin LIKE '%" +
                 origin + "%' AND destination LIKE '%" + destination + "%' AND code_reply = '1'";
@@ -177,7 +181,7 @@ public class SqliteDB {
         }
         return -1;
     }
-    String getMostPopularInDay()
+    String getMostPopularInDay(String lg)
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
@@ -186,7 +190,7 @@ public class SqliteDB {
         try {
             Statement stmt = co.createStatement();
             ResultSet resultSet = stmt.executeQuery(sql);
-            return resultSet.getString(1) + " " + resultSet.getString(2);
+            return this.getNameCity(resultSet.getString(1), lg) + " " + this.getNameCity(resultSet.getString(2), lg);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -207,7 +211,7 @@ public class SqliteDB {
         return "ERROR";
     }
 
-    String getMostPopularInMonth()
+    String getMostPopularInMonth(String lg)
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
@@ -216,7 +220,7 @@ public class SqliteDB {
         try {
             Statement stmt = co.createStatement();
             ResultSet resultSet = stmt.executeQuery(sql);
-            return resultSet.getString(1) + " " + resultSet.getString(2);
+            return this.getNameCity(resultSet.getString(1), lg) + " " + this.getNameCity(resultSet.getString(2), lg);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -235,5 +239,47 @@ public class SqliteDB {
             }
         }
         return "ERROR";
+    }
+
+    String getCode(String town)
+    {
+        String sql = "SELECT code FROM city WHERE name LIKE '%" + town + "%' OR ru_name LIKE '%" + town + "%'";
+        try {
+            Statement stmt = co.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+            return resultSet.getString(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "error";
+        }
+    }
+
+    String getNameCity(String code, String lg)
+    {
+        if (lg.equals("ru"))
+        {
+            String sql = "SELECT name FROM city WHERE code LIKE '%" + code + "%'";
+            try {
+                Statement stmt = co.createStatement();
+                ResultSet resultSet = stmt.executeQuery(sql);
+                return resultSet.getString(1);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return "error";
+            }
+        }
+        else if (lg.equals("en"))
+        {
+            String sql = "SELECT ru_name FROM city WHERE code LIKE '%" + code + "%'";
+            try {
+                Statement stmt = co.createStatement();
+                ResultSet resultSet = stmt.executeQuery(sql);
+                return resultSet.getString(1);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return "error";
+            }
+        }
+        return "error";
     }
 }
