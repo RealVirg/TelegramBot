@@ -7,13 +7,13 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class Request {
-    public String[] input;
-    public String des;
-    public String reply;
-    public String request_url;
-    public String wrongInput = "Please, can you write your request right?\n" +
+    String[] input;
+    String des;
+    String reply;
+    String request_url;
+    String wrongInput = "Please, can you write your request right?\n" +
             "If you don't know how, you can use /seekCheapestFlight for check some example or read a documentation.";
-    public String notFound = "Sorry, but there are no results for your search.\n" +
+    String notFound = "Sorry, but there are no results for your search.\n" +
             "Check your input information. Maybe you entered the wrong date?";
 
     Request(String[] st, String url) {
@@ -22,7 +22,7 @@ public class Request {
         request_url = url;
     }
 
-    public String getHTTP(String urlToRead) throws Exception {
+    String getHTTP(String urlToRead) throws Exception {
         StringBuilder result = new StringBuilder();
         URL url = new URL(urlToRead);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -36,7 +36,7 @@ public class Request {
         return result.toString();
     }
 
-    public void seekCheapestFlight(SqliteDB conn, boolean flag)
+    void seekCheapestFlight(SqliteDB conn, boolean flag)
     {
         if (input.length == 5 || input.length == 6 || input.length == 4){
             boolean withoutReturnDate = false;
@@ -143,7 +143,7 @@ public class Request {
         }
     }
 
-    public void parserJSONCheapestFlight(String jsonCode) {
+    void parserJSONCheapestFlight(String jsonCode) {
         JSONObject jsonObject = new JSONObject(jsonCode);
         boolean success = jsonObject.getBoolean("success");
         Object temp = jsonObject.get("data");

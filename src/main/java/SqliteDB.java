@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SqliteDB {
-    public Connection co = null;
-    public SqliteDB()
+    private Connection co = null;
+    SqliteDB()
     {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -16,7 +16,7 @@ public class SqliteDB {
         }
     }
 
-    public void CreateLogTableMonth()
+    void CreateLogTableMonth()
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
@@ -43,7 +43,7 @@ public class SqliteDB {
 
     }
 
-    public void CreateLogTableDay()
+    void CreateLogTableDay()
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
@@ -68,7 +68,7 @@ public class SqliteDB {
         }
     }
 
-    public void InsertLogLineInTableMonth(String origin, String destination,
+    void InsertLogLineInTableMonth(String origin, String destination,
                                           String depart_date, String return_date,
                                           String currency, int code_reply, String full_request)
     {
@@ -93,7 +93,7 @@ public class SqliteDB {
 
     }
 
-    public void InsertLogLineInTableDay(String origin, String destination,
+    void InsertLogLineInTableDay(String origin, String destination,
                                         String depart_date, String return_date,
                                         String currency, int code_reply, String full_request)
     {
@@ -116,13 +116,13 @@ public class SqliteDB {
         }
     }
 
-    public int GetCountMonth(String origin, String destination)
+    int GetCountMonth(String origin, String destination)
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
         String sql = "SELECT COUNT(*) FROM t" +
                 dateFormat.format(date) + " WHERE origin LIKE '%" +
-                origin + "%' AND destination LIKE '%" + destination + "%'";
+                origin + "%' AND destination LIKE '%" + destination + "%' AND code_reply = '1'";
         try {
             Statement stmt = co.createStatement();
             ResultSet resultSet = stmt.executeQuery(sql);
@@ -130,16 +130,30 @@ public class SqliteDB {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        finally
+        {
+            if (co != null)
+            {
+                try
+                {
+                    co.close();
+                }
+                catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
         return -1;
     }
 
-    public int GetCountDay(String origin, String destination)
+    int GetCountDay(String origin, String destination)
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
         String sql = "SELECT COUNT(*) FROM t" +
                 dateFormat.format(date) + " WHERE origin LIKE '%" +
-                origin + "%' AND destination LIKE '%" + destination + "%'";
+                origin + "%' AND destination LIKE '%" + destination + "%' AND code_reply = '1'";
         try {
             Statement stmt = co.createStatement();
             ResultSet resultSet = stmt.executeQuery(sql);
@@ -147,9 +161,23 @@ public class SqliteDB {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        finally
+        {
+            if (co != null)
+            {
+                try
+                {
+                    co.close();
+                }
+                catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
         return -1;
     }
-    public String getMostPopularInDay()
+    String getMostPopularInDay()
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
@@ -179,7 +207,7 @@ public class SqliteDB {
         return "ERROR";
     }
 
-    public String getMostPopularInMonth()
+    String getMostPopularInMonth()
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");

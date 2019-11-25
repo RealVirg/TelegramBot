@@ -3,7 +3,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import java.sql.*;
 
 public class Bot extends TelegramLongPollingBot {
 
@@ -52,7 +51,6 @@ public class Bot extends TelegramLongPollingBot {
                 else if (oddr[0].equals("/seekCheapestFlight"))
                 {
                     try {
-//                        outMessage.setText(SeekFly(oddr));
                         Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
                         r.seekCheapestFlight(conn, true);
                         outMessage.setText(r.reply);
