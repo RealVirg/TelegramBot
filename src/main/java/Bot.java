@@ -1,8 +1,15 @@
+import com.tbot.calendar.CalendarUtil;
+import org.joda.time.LocalDate;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
@@ -26,7 +33,7 @@ public class Bot extends TelegramLongPollingBot {
                 {
                     outMessage.setText("Bot to seek for cheap flights.\n"+
                             "Commands: \n" + "/help\n/whatIsIATACode\n/seekCheapestFlight\n"
-                    + "/getCountMonth\n" + "/getCountDay\n" + "/getMostPopularInMonth\n" + "/getMostPopularInDay\n");
+                    + "/getCountMonth\n" + "/getCountDay\n" + "/getMostPopularInMonth\n" + "/getMostPopularInDay\n" + "/calendar\n");
                     execute(outMessage);
                 }
                 else if (inMessage.getText().equals("/whatIsIATACode")) {
@@ -95,6 +102,16 @@ public class Bot extends TelegramLongPollingBot {
                     }
                     execute(outMessage);
                 }
+                else if (oddr[0].equals("/calendar"))
+                {
+                    try {
+                        execute(sendInlineKeyBoardMessage(update.getMessage().getChatId()));
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
                 else {
                     outMessage.setText("I can't understand you.\nPlease use /help for check commands.");
                     execute(outMessage);
@@ -103,6 +120,39 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    public static SendMessage sendInlineKeyBoardMessage(long chatId)
+    {
+        CalendarUtil temp = new CalendarUtil();
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        while (true)
+        {
+
+
+            break;
+        }
+
+        return new SendMessage().setChatId(chatId).setText("qq").setReplyMarkup(inlineKeyboardMarkup);
+        /*
+        примеры кнопок
+        InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
+        InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton();
+        inlineKeyboardButton1.setText(temp.generateKeyboard(LocalDate.now()));
+        inlineKeyboardButton1.setCallbackData("Button \"Тык\" has been pressed");
+        inlineKeyboardButton2.setText("Тык2");
+        inlineKeyboardButton2.setCallbackData("Button \"Тык2\" has been pressed");
+        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
+        List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
+        keyboardButtonsRow1.add(inlineKeyboardButton1);
+        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Fi4a").setCallbackData("CallFi4a"));
+        keyboardButtonsRow2.add(inlineKeyboardButton2);
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        rowList.add(keyboardButtonsRow1);
+        rowList.add(keyboardButtonsRow2);
+        inlineKeyboardMarkup.setKeyboard(rowList);
+        return new SendMessage().setChatId(chatId).setText("Пример").setReplyMarkup(inlineKeyboardMarkup);
+         */
     }
 
     @Override
