@@ -46,7 +46,7 @@ public class Request {
 
     String seekCheapestFlight()
     {
-        int min = 1999999998;
+        int min = 1999999999;
         String minString = wrongInput;
         for (String o : origins){
             for (String d: destinations){
@@ -177,7 +177,7 @@ public class Request {
             e.printStackTrace();
             System.out.println("4");
             reply = notFound;
-            return 1999999999;
+            return 1999999998;
         }
     }
 }
