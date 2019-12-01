@@ -1,5 +1,3 @@
-import com.tbot.calendar.CalendarUtil;
-import org.joda.time.LocalDate;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -105,13 +103,24 @@ public class Bot extends TelegramLongPollingBot {
                 else if (oddr[0].equals("/calendar"))
                 {
                     try {
-                        execute(sendInlineKeyBoardMessage(update.getMessage().getChatId()));
+                        execute(sendInlineKeyBoardMessage(update.getMessage().getChatId(),
+                                CalendarUtil.currentDate.getMonthOfYear(), CalendarUtil.currentDate.getYear()));
                     }
-                    catch (Exception e)
-                    {
+                    catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+
+                else if (update.hasCallbackQuery())
+                {
+                    try {
+                        //if (update.getCallbackQuery().getData().equals("<") || update.getCallbackQuery().getData().equals(">"))
+                        execute(new SendMessage().setText(update.getCallbackQuery().getData()).setChatId(update.getCallbackQuery().getMessage().getChatId()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 else {
                     outMessage.setText("I can't understand you.\nPlease use /help for check commands.");
                     execute(outMessage);
@@ -122,37 +131,73 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public static SendMessage sendInlineKeyBoardMessage(long chatId)
+    public static SendMessage sendInlineKeyBoardMessage(long chatId, int month, int year)
     {
-        CalendarUtil temp = new CalendarUtil();
+        /*
+        int tmp = CalendarUtil.currentDate.getMonthOfYear();
+        String currentMonth = CalendarUtil.months[tmp-1];
+
+        int currentMonthDay = CalendarUtil.currentDate.getDayOfMonth();
+        int currentWeekDay = CalendarUtil.currentDate.getDayOfWeek();
+        int currentYear = CalendarUtil.currentDate.getYear();
+
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        while (true)
+
+        InlineKeyboardButton leftArrow = new InlineKeyboardButton();
+        leftArrow.setText("<");
+        leftArrow.setCallbackData("Button \"<\" has been pressed");
+
+        InlineKeyboardButton buttonMonth = new InlineKeyboardButton();
+        buttonMonth.setText(currentMonth + " " + currentYear);
+        buttonMonth.setCallbackData("Button \"Month\" has been pressed");
+
+        InlineKeyboardButton rightArrow = new InlineKeyboardButton();
+        rightArrow.setText(">");
+        rightArrow.setCallbackData("Button \">\" has been pressed");
+
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        row1.add(leftArrow);
+        row1.add(buttonMonth);
+        row1.add(rightArrow);
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+
+        for (int i=0;i<=6;i++)
         {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(CalendarUtil.days[i]);
+            button.setCallbackData("Button \"weekDay " + CalendarUtil.days[i] + "\" has been pressed");
 
-
-            break;
+            row2.add(button);
         }
 
-        return new SendMessage().setChatId(chatId).setText("qq").setReplyMarkup(inlineKeyboardMarkup);
-        /*
-        примеры кнопок
-        InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
-        InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton();
-        inlineKeyboardButton1.setText(temp.generateKeyboard(LocalDate.now()));
-        inlineKeyboardButton1.setCallbackData("Button \"Тык\" has been pressed");
-        inlineKeyboardButton2.setText("Тык2");
-        inlineKeyboardButton2.setCallbackData("Button \"Тык2\" has been pressed");
-        List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
-        keyboardButtonsRow1.add(inlineKeyboardButton1);
-        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Fi4a").setCallbackData("CallFi4a"));
-        keyboardButtonsRow2.add(inlineKeyboardButton2);
-        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
-        rowList.add(keyboardButtonsRow1);
-        rowList.add(keyboardButtonsRow2);
+        List<List<InlineKeyboardButton>> rowList= new ArrayList<>();
+        rowList.add(row1);
+        rowList.add(row2);
+
+        for (int line = 0; line <= 4; line++)
+        {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+
+            for (int col = 0; col <= 6; col++)
+            {
+                InlineKeyboardButton button = new InlineKeyboardButton();
+                button.setCallbackData("Button \"day\" has been pressed");
+                button.setText("gg");
+                row.add(button);
+            }
+
+            rowList.add(row);
+        }
+
         inlineKeyboardMarkup.setKeyboard(rowList);
-        return new SendMessage().setChatId(chatId).setText("Пример").setReplyMarkup(inlineKeyboardMarkup);
+
+
          */
+        //InlineKeyboardMarkup inlineKeyboardMarkup = CalendarUtil.createMonth(11, 2019, CalendarUtil.currentDate);
+        InlineKeyboardMarkup inlineKeyboardMarkup = CalendarUtil.createMonth(month, year, CalendarUtil.currentDate);
+
+        return new SendMessage().setChatId(chatId).setText("Calendar").setReplyMarkup(inlineKeyboardMarkup);
     }
 
     @Override
