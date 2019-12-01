@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
-    private List<String> origin = new ArrayList<>();
-    private List<String> destination = new ArrayList<>();
+    //private List<String> origin = new ArrayList<>();
+    //private List<String> destination = new ArrayList<>();
     private String currency = "RUB";
 
     @Override
@@ -74,8 +74,8 @@ public class Bot extends TelegramLongPollingBot {
                 {
                     SqliteDB db = new SqliteDB();
                     try {
-                        origin = db.getCode(oddr[1]);
-                        destination = db.getCode(oddr[2]);
+                        CalendarUtil.origin = db.getCode(oddr[1]);
+                        CalendarUtil.destination = db.getCode(oddr[2]);
                         currency = oddr[3];
 //                        Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
 //                        r.seekCheapestFlight(conn, true);
@@ -165,7 +165,7 @@ public class Bot extends TelegramLongPollingBot {
                               !update.getCallbackQuery().getData().equals(">"))
                     {
                         Request r = new Request("http://api.travelpayouts.com/v1/prices/direct?",
-                                origin, destination,
+                                CalendarUtil.origin, CalendarUtil.destination,
                                 update.getCallbackQuery().getData(),
                                 currency);
                         execute(new SendMessage().setText(r.seekCheapestFlight()).setChatId(update.getCallbackQuery().getMessage().getChatId()));
