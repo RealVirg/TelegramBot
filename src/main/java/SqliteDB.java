@@ -1,8 +1,7 @@
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SqliteDB {
     public Connection co = null;
@@ -119,8 +118,8 @@ public class SqliteDB {
     int GetCountMonth(String origin, String destination)
     {
         Date date = new Date();
-        origin = this.getCode(origin);
-        destination = this.getCode(destination);
+        origin = this.getCode(origin).get(0);
+        destination = this.getCode(destination).get(0);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM");
         String sql = "SELECT COUNT(*) FROM t" +
                 dateFormat.format(date) + " WHERE origin LIKE '%" +
@@ -153,8 +152,8 @@ public class SqliteDB {
     {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
-        origin = this.getCode(origin);
-        destination = this.getCode(destination);
+        origin = this.getCode(origin).get(0);
+        destination = this.getCode(destination).get(0);
         String sql = "SELECT COUNT(*) FROM t" +
                 dateFormat.format(date) + " WHERE origin LIKE '%" +
                 origin + "%' AND destination LIKE '%" + destination + "%' AND code_reply = '1'";
@@ -241,16 +240,21 @@ public class SqliteDB {
         return "ERROR";
     }
 
-    String getCode(String town)
+    List<String> getCode(String town)
     {
         String sql = "SELECT code FROM city WHERE name LIKE '%" + town + "%' OR ru_name LIKE '%" + town + "%'";
         try {
             Statement stmt = co.createStatement();
             ResultSet resultSet = stmt.executeQuery(sql);
-            return resultSet.getString(1);
+            List<String> result = new ArrayList<>();
+            while (resultSet.next())
+            {
+                result.add(resultSet.getString(1));
+            }
+            return result;
         } catch (SQLException e) {
             e.printStackTrace();
-            return "error";
+            return null;
         }
     }
 

@@ -5,19 +5,27 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Request {
-    String[] input;
     String des;
     String reply;
+    List<String> origins;
+    List<String> destinations;
+    String date;
+    String currency;
     String request_url;
-    String wrongInput = "Please, can you write your request right?\n" +
+    private String wrongInput = "Please, can you write your request right?\n" +
             "If you don't know how, you can use /seekCheapestFlight for check some example or read a documentation.";
-    String notFound = "Sorry, but there are no results for your search.\n" +
+    private String notFound = "Sorry, but there are no results for your search.\n" +
             "Check your input information. Maybe you entered the wrong date?";
 
-    Request(String[] st, String url) {
-        input = st;
+    Request(String url, List<String> o, List<String> d, String da, String c) {
+        origins = o;
+        destinations = d;
+        currency = c;
+        date = da;
         des = "";
         request_url = url;
     }
@@ -36,129 +44,105 @@ public class Request {
         return result.toString();
     }
 
-    void seekCheapestFlight(SqliteDB conn, boolean flag)
+    String seekCheapestFlight()
     {
-        if (input.length == 5 || input.length == 6 || input.length == 4){
-            boolean withoutReturnDate = false;
-            if (((input[input.length - 1].equals("RUB") ||
-                    input[input.length - 1].equals("EUR") ||
-                    input[input.length - 1].equals("USD")) && input.length == 5) ||
-                    input.length == 4) {
-                withoutReturnDate = true;
-            }
-            String token = "5d146c60846217f62771c7faaddbff4b";
-            String origin = "";
-            String destination = "";
-            String depart_date = "";
-            String return_date = "";
-            String currency = "RUB";
-            try {
-                if (!withoutReturnDate){
-                    origin = conn.getCode(input[1]);
-                    destination = conn.getCode(input[2]);
+        int min = 1999999998;
+        String minString = wrongInput;
+        for (String o : origins){
+            for (String d: destinations){
+                String token = "5d146c60846217f62771c7faaddbff4b";
+                String origin = "";
+                String destination = "";
+                String depart_date = "";
+                String currency = "RUB";
+                try {
+                    origin = o;
+                    destination = d;
                     des = destination;
-                    depart_date = input[3];
-                    return_date = input[4];
-                    if (input.length == 6)
-                    {
-                        currency = input[5];
-                    }
+                    depart_date = date;
+                    currency = this.currency;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("1");
+                    return wrongInput;
                 }
-                else
+                if (origin.equals("error") || destination.equals("error"))
                 {
-                    origin = conn.getCode(input[1]);
-                    destination = conn.getCode(input[2]);
-                    des = destination;
-                    depart_date = input[3];
-                    if (input.length == 5)
+                    System.out.println("2");
+                    return wrongInput;
+                }
+                String url;
+                url = request_url +
+                            "origin=" + origin +
+                            "&destination=" + destination +
+                            "&depart_date=" + depart_date +
+                            "&token=" + token +
+                            "&currency=" + currency;
+                System.out.println(url);
+                try {
+                    int k = this.parserJSONCheapestFlight(getHTTP(url));
+                    if (k < min)
                     {
-                        currency = input[4];
+                        minString = reply;
+                        min = k;
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("3");
+                    return wrongInput;
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                reply = wrongInput;
-            }
-            if (origin.equals("error") || destination.equals("error"))
-            {
-                reply = wrongInput;
-                return;
-            }
-            String url;
-            if (!withoutReturnDate) {
-                url = request_url +
-                        "origin=" + origin +
-                        "&destination=" + destination +
-                        "&depart_date=" + depart_date +
-                        "&return_date=" + return_date +
-                        "&token=" + token +
-                        "&currency=" + currency;
-            }
-            else {
-                url = request_url +
-                        "origin=" + origin +
-                        "&destination=" + destination +
-                        "&depart_date=" + depart_date +
-                        "&token=" + token +
-                        "&currency=" + currency;
-            }
-            try {
-                this.parserJSONCheapestFlight(getHTTP(url));
-            } catch (Exception e) {
-                e.printStackTrace();
-                reply = wrongInput;
-            }
-            if (flag) {
-                int code_replay;
-                String full_request = "";
-                for (int i = 0; i < input.length; i++) {
-                    full_request += input[i];
-                    full_request += " ";
-                }
-                if (reply.equals(wrongInput))
-                    code_replay = -1;
-                else if (reply.equals(notFound))
-                    code_replay = 0;
-                else
-                    code_replay = 1;
-                if (code_replay != -1)
-                {
-                    conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
-                    conn.InsertLogLineInTableMonth(origin, destination, depart_date, return_date, currency, code_replay, full_request);
-                }
-                else {
-                    conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
-                    conn.InsertLogLineInTableMonth("", "", "", "", "", -1, full_request);
-                }
+//                if (flag) {
+//                    int code_replay;
+//                    String full_request = "";
+//                    for (int i = 0; i < input.length; i++) {
+//                        full_request += input[i];
+//                        full_request += " ";
+//                    }
+//                    if (reply.equals(wrongInput))
+//                        code_replay = -1;
+//                    else if (reply.equals(notFound))
+//                        code_replay = 0;
+//                    else
+//                        code_replay = 1;
+//                    if (code_replay != -1)
+//                    {
+//                        conn.InsertLogLineInTableDay(origin, destination, depart_date, return_date, currency, code_replay, full_request);
+//                        conn.InsertLogLineInTableMonth(origin, destination, depart_date, return_date, currency, code_replay, full_request);
+//                    }
+//                    else {
+//                        conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
+//                        conn.InsertLogLineInTableMonth("", "", "", "", "", -1, full_request);
+//                    }
+//                }
             }
         }
-        else
-        {
-            reply = wrongInput;
-            if (flag) {
-                String full_request = "";
-                for (int i = 0; i < input.length; i++) {
-                    full_request += input[i];
-                    full_request += " ";
-                }
-                conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
-                conn.InsertLogLineInTableMonth("", "", "", "", "", -1, full_request);
-            }
-        }
-        if (conn.co != null)
-        {
-            try {
-                conn.co.close();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
+//        else
+//        {
+//            reply = wrongInput;
+//            if (flag) {
+//                String full_request = "";
+//                for (int i = 0; i < input.length; i++) {
+//                    full_request += input[i];
+//                    full_request += " ";
+//                }
+//                conn.InsertLogLineInTableDay("", "", "", "", "", -1, full_request);
+//                conn.InsertLogLineInTableMonth("", "", "", "", "", -1, full_request);
+//            }
+//        }
+//        if (conn.co != null)
+//        {
+//            try {
+//                conn.co.close();
+//            }
+//            catch (Exception e)
+//            {
+//                e.printStackTrace();
+//            }
+//        }
+        return minString;
     }
 
-    void parserJSONCheapestFlight(String jsonCode) {
+    int parserJSONCheapestFlight(String jsonCode) {
         JSONObject jsonObject = new JSONObject(jsonCode);
         boolean success = jsonObject.getBoolean("success");
         Object temp = jsonObject.get("data");
@@ -184,9 +168,16 @@ public class Request {
                     "Return at: " + lowestPriceReturnAt + "\n" +
                     "Expires at: " + lowestPriceExpiresAt + "\n" +
                     "http://pics.avs.io/200/200/" + lowestPriceAirline + ".png";
+            System.out.println(reply);
+            System.out.println("\n");
+            System.out.println(lowestPrice);
+            System.out.println("\n");
+            return lowestPrice;
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("4");
             reply = notFound;
+            return 1999999999;
         }
     }
 }

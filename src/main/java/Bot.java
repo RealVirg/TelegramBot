@@ -6,10 +6,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
+    private List<String> origin = new ArrayList<>();
+    private List<String> destination = new ArrayList<>();
+    private String currency = "RUB";
 
     @Override
     public String getBotToken() {
@@ -23,10 +27,23 @@ public class Bot extends TelegramLongPollingBot {
                 SqliteDB conn = new SqliteDB();
                 conn.CreateLogTableDay();
                 conn.CreateLogTableMonth();
+                if (conn.co != null)
+                {
+                    try
+                    {
+                        conn.co.close();
+                    }
+                    catch (SQLException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
                 Message inMessage = update.getMessage();
                 SendMessage outMessage = new SendMessage();
                 outMessage.setChatId(inMessage.getChatId());
                 String[] oddr = inMessage.getText().split(" ");
+
                 if (inMessage.getText().equals("/help"))
                 {
                     outMessage.setText("Bot to seek for cheap flights.\n"+
@@ -55,14 +72,38 @@ public class Bot extends TelegramLongPollingBot {
                 }
                 else if (oddr[0].equals("/seekCheapestFlight"))
                 {
+                    SqliteDB db = new SqliteDB();
                     try {
-                        Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
-                        r.seekCheapestFlight(conn, true);
-                        outMessage.setText(r.reply);
+                        origin = db.getCode(oddr[1]);
+                        destination = db.getCode(oddr[2]);
+                        currency = oddr[3];
+//                        Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
+//                        r.seekCheapestFlight(conn, true);
+//                        outMessage.setText(r.reply);
+                        try {
+                            execute(sendInlineKeyBoardMessage(update.getMessage().getChatId(),
+                                    CalendarUtil.currentDate.getMonthOfYear(), CalendarUtil.currentDate.getYear()));
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    execute(outMessage);
+                    finally
+                    {
+                        if (db.co != null)
+                        {
+                            try
+                            {
+                                conn.co.close();
+                            }
+                            catch (SQLException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
                 else if (oddr[0].equals("/getCountMonth"))
                 {
@@ -123,7 +164,11 @@ public class Bot extends TelegramLongPollingBot {
                               !update.getCallbackQuery().getData().equals("<") &&
                               !update.getCallbackQuery().getData().equals(">"))
                     {
-                        execute(new SendMessage().setText(update.getCallbackQuery().getData()).setChatId(update.getCallbackQuery().getMessage().getChatId()));
+                        Request r = new Request("http://api.travelpayouts.com/v1/prices/direct?",
+                                origin, destination,
+                                update.getCallbackQuery().getData(),
+                                currency);
+                        execute(new SendMessage().setText(r.seekCheapestFlight()).setChatId(update.getCallbackQuery().getMessage().getChatId()));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -136,68 +181,6 @@ public class Bot extends TelegramLongPollingBot {
 
     public static SendMessage sendInlineKeyBoardMessage(long chatId, int month, int year)
     {
-        /*
-        int tmp = CalendarUtil.currentDate.getMonthOfYear();
-        String currentMonth = CalendarUtil.months[tmp-1];
-
-        int currentMonthDay = CalendarUtil.currentDate.getDayOfMonth();
-        int currentWeekDay = CalendarUtil.currentDate.getDayOfWeek();
-        int currentYear = CalendarUtil.currentDate.getYear();
-
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
-        InlineKeyboardButton leftArrow = new InlineKeyboardButton();
-        leftArrow.setText("<");
-        leftArrow.setCallbackData("Button \"<\" has been pressed");
-
-        InlineKeyboardButton buttonMonth = new InlineKeyboardButton();
-        buttonMonth.setText(currentMonth + " " + currentYear);
-        buttonMonth.setCallbackData("Button \"Month\" has been pressed");
-
-        InlineKeyboardButton rightArrow = new InlineKeyboardButton();
-        rightArrow.setText(">");
-        rightArrow.setCallbackData("Button \">\" has been pressed");
-
-        List<InlineKeyboardButton> row1 = new ArrayList<>();
-        row1.add(leftArrow);
-        row1.add(buttonMonth);
-        row1.add(rightArrow);
-
-        List<InlineKeyboardButton> row2 = new ArrayList<>();
-
-        for (int i=0;i<=6;i++)
-        {
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(CalendarUtil.days[i]);
-            button.setCallbackData("Button \"weekDay " + CalendarUtil.days[i] + "\" has been pressed");
-
-            row2.add(button);
-        }
-
-        List<List<InlineKeyboardButton>> rowList= new ArrayList<>();
-        rowList.add(row1);
-        rowList.add(row2);
-
-        for (int line = 0; line <= 4; line++)
-        {
-            List<InlineKeyboardButton> row = new ArrayList<>();
-
-            for (int col = 0; col <= 6; col++)
-            {
-                InlineKeyboardButton button = new InlineKeyboardButton();
-                button.setCallbackData("Button \"day\" has been pressed");
-                button.setText("gg");
-                row.add(button);
-            }
-
-            rowList.add(row);
-        }
-
-        inlineKeyboardMarkup.setKeyboard(rowList);
-
-
-         */
-        //InlineKeyboardMarkup inlineKeyboardMarkup = CalendarUtil.createMonth(11, 2019, CalendarUtil.currentDate);
         InlineKeyboardMarkup inlineKeyboardMarkup = CalendarUtil.createMonth(month, year, CalendarUtil.currentDate);
 
         return new SendMessage().setChatId(chatId).setText("Calendar").setReplyMarkup(inlineKeyboardMarkup);
