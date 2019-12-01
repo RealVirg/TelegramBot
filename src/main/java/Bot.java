@@ -111,19 +111,22 @@ public class Bot extends TelegramLongPollingBot {
                     }
                 }
 
-                else if (update.hasCallbackQuery())
-                {
-                    try {
-                        //if (update.getCallbackQuery().getData().equals("<") || update.getCallbackQuery().getData().equals(">"))
-                        execute(new SendMessage().setText(update.getCallbackQuery().getData()).setChatId(update.getCallbackQuery().getMessage().getChatId()));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 else {
                     outMessage.setText("I can't understand you.\nPlease use /help for check commands.");
                     execute(outMessage);
+                }
+            }
+            else if (update.hasCallbackQuery())
+            {
+                try {
+                    if (!update.getCallbackQuery().getData().equals("nothing") &&
+                              !update.getCallbackQuery().getData().equals("<") &&
+                              !update.getCallbackQuery().getData().equals(">"))
+                    {
+                        execute(new SendMessage().setText(update.getCallbackQuery().getData()).setChatId(update.getCallbackQuery().getMessage().getChatId()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         } catch (TelegramApiException e) {

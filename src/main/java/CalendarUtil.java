@@ -81,21 +81,30 @@ public class CalendarUtil
             {
                 String text = " ";
                 InlineKeyboardButton button = new InlineKeyboardButton();
-                button.setCallbackData(Integer.toString(day) + "-" + createdMonth + "-" + createdYear);
+
+                button.setCallbackData("nothing");
+                //if (!text.equals(" "))
+                    //button.setCallbackData(Integer.toString(day) + "-" + createdMonth + "-" + createdYear);
+                //else
+                    //button.setCallbackData("nothing");
 
                 if (isVis)
                 {
                     if ((line != 0 || col + 1 >= tmpWeek1) && day <= visMaxDays[createdMonth-1])
                     {
                         text = Integer.toString(day);
+                        button.setCallbackData(Integer.toString(day) + "-" + createdMonth + "-" + createdYear);
                         day++;
                     }
                 }
                 else
                 {
                     if ((line != 0 || col + 1 >= tmpWeek1) && day <= maxDays[createdMonth-1])
-                    text = Integer.toString(day);
-                    day++;
+                    {
+                        text = Integer.toString(day);
+                        button.setCallbackData(Integer.toString(day) + "-" + createdMonth + "-" + createdYear);
+                        day++;
+                    }
                 }
 
                 button.setText(text);
