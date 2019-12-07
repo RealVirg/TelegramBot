@@ -25,8 +25,11 @@ public class CalendarUtil
         return year%4==0 && year%100 !=0 || year%400==0;
     }
 
-//    public static List<String> origin = new ArrayList<>();
-//    public static List<String> destination = new ArrayList<>();
+    public static List<String> origin = new ArrayList<>();
+    public static List<String> destination = new ArrayList<>();
+
+    public static int calendarMonth = currentDate.getMonthOfYear();
+    public static int calendarYear = currentDate.getYear();
 
     public static InlineKeyboardMarkup createMonth (int createdMonth, int createdYear, LocalDate date)
     {
