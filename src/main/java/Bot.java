@@ -82,7 +82,7 @@ public class Bot extends TelegramLongPollingBot {
 //                        r.seekCheapestFlight(conn, true);
 //                        outMessage.setText(r.reply);
                         try {
-                            execute(sendInlineKeyBoardMessage(update.getMessage().getChatId(),
+                            execute(CalendarUtil.sendInlineKeyBoardMessage(update.getMessage().getChatId(),
                                     CalendarUtil.currentDate.getMonthOfYear(), CalendarUtil.currentDate.getYear()));
                         }
                         catch (Exception e) {
@@ -145,7 +145,7 @@ public class Bot extends TelegramLongPollingBot {
                 else if (oddr[0].equals("/calendar"))
                 {
                     try {
-                        execute(sendInlineKeyBoardMessage(update.getMessage().getChatId(),
+                        execute(CalendarUtil.sendInlineKeyBoardMessage(update.getMessage().getChatId(),
                                 CalendarUtil.currentDate.getMonthOfYear(), CalendarUtil.currentDate.getYear()));
                         
                     }
@@ -180,7 +180,7 @@ public class Bot extends TelegramLongPollingBot {
                             CalendarUtil.calendarYear--;
                             CalendarUtil.calendarMonth = 12;
                         }
-                        execute(sendInlineKeyBoardMessage(update.getCallbackQuery().getMessage().getChatId(),
+                        execute(CalendarUtil.sendInlineKeyBoardMessage(update.getCallbackQuery().getMessage().getChatId(),
                                 CalendarUtil.calendarMonth, CalendarUtil.calendarYear));
                     }
                     else if (update.getCallbackQuery().getData().equals(">"))
@@ -191,7 +191,7 @@ public class Bot extends TelegramLongPollingBot {
                             CalendarUtil.calendarYear++;
                             CalendarUtil.calendarMonth = 1;
                         }
-                        execute(sendInlineKeyBoardMessage(update.getCallbackQuery().getMessage().getChatId(),
+                        execute(CalendarUtil.sendInlineKeyBoardMessage(update.getCallbackQuery().getMessage().getChatId(),
                                 CalendarUtil.calendarMonth, CalendarUtil.calendarYear));
                     }
                 } catch (Exception e) {
@@ -201,13 +201,6 @@ public class Bot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-    }
-
-    public static SendMessage sendInlineKeyBoardMessage(long chatId, int month, int year)
-    {
-        InlineKeyboardMarkup inlineKeyboardMarkup = CalendarUtil.createMonth(month, year, CalendarUtil.currentDate);
-
-        return new SendMessage().setChatId(chatId).setText("Calendar").setReplyMarkup(inlineKeyboardMarkup);
     }
 
     @Override

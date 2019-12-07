@@ -1,6 +1,7 @@
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -30,6 +31,13 @@ public class CalendarUtil
 
     public static int calendarMonth = currentDate.getMonthOfYear();
     public static int calendarYear = currentDate.getYear();
+
+    public static SendMessage sendInlineKeyBoardMessage(long chatId, int month, int year)
+    {
+        InlineKeyboardMarkup inlineKeyboardMarkup = CalendarUtil.createMonth(month, year, CalendarUtil.currentDate);
+
+        return new SendMessage().setChatId(chatId).setText("Calendar").setReplyMarkup(inlineKeyboardMarkup);
+    }
 
     public static InlineKeyboardMarkup createMonth (int createdMonth, int createdYear, LocalDate date)
     {
@@ -99,8 +107,8 @@ public class CalendarUtil
                     if ((line != 0 || col + 1 >= tmpWeek1) && day <= visMaxDays[createdMonth-1])
                     {
                         text = Integer.toString(day);
-//                        button.setCallbackData(Integer.toString(day) + "-" + createdMonth + "-" + createdYear);
-                        button.setCallbackData(createdYear + "-" + createdMonth + "-" + Integer.toString(day));
+
+                        button.setCallbackData(createdYear + "-" + normFormat(createdMonth) + "-" + normFormat(day));
                         day++;
                     }
                 }
@@ -109,8 +117,8 @@ public class CalendarUtil
                     if ((line != 0 || col + 1 >= tmpWeek1) && day <= maxDays[createdMonth-1])
                     {
                         text = Integer.toString(day);
-//                        button.setCallbackData(Integer.toString(day) + "-" + createdMonth + "-" + createdYear);
-                        button.setCallbackData(createdYear + "-" + createdMonth + "-" + Integer.toString(day));
+
+                        button.setCallbackData(createdYear + "-" + normFormat(createdMonth) + "-" + normFormat(day));
                         day++;
                     }
                 }
@@ -127,5 +135,11 @@ public class CalendarUtil
         return inlineKeyboardMarkup;
     }
 
-
+    public static String normFormat (int a)
+    {
+        if (a<10)
+            return "0" + a;
+        else
+            return "" + a;
+    }
 }
