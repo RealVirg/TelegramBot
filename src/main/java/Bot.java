@@ -1,3 +1,5 @@
+
+import org.joda.time.LocalDate;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -8,12 +10,21 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
-    //private List<String> origin = new ArrayList<>();
-    //private List<String> destination = new ArrayList<>();
-    private String currency = "RUB";
+//    private List<String> origin = new ArrayList<>();
+//    private List<String> destination = new ArrayList<>();
+//    private String currency = "RUB";
+//    private LocalDate currentDate = LocalDate.now();
+//    private int calendarMonth = currentDate.getMonthOfYear();
+//    private int calendarYear = currentDate.getYear();
+    private HashMap<Long, List<String>> usersOrigin = new HashMap<Long, List<String>>();
+    private HashMap<Long, List<String>> usersDestination = new HashMap<Long, List<String>>();
+    private HashMap<Long, String> usersCurrency = new HashMap<Long, String>();
+    private HashMap<Long, Integer> usersMonth = new HashMap<Long, Integer>();
+    private HashMap<Long, Integer> usersYear = new HashMap<Long, Integer>();
 
 
     @Override
@@ -25,6 +36,7 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         try {
             if (update.hasMessage() && update.getMessage().hasText()) {
+                Long id = update.getMessage().getChatId();
                 SqliteDB conn = new SqliteDB();
                 conn.CreateLogTableDay();
                 conn.CreateLogTableMonth();
@@ -75,15 +87,23 @@ public class Bot extends TelegramLongPollingBot {
                 {
                     SqliteDB db = new SqliteDB();
                     try {
-                        CalendarUtil.origin = db.getCode(oddr[1]);
-                        CalendarUtil.destination = db.getCode(oddr[2]);
-                        currency = oddr[3];
+                        LocalDate currentDate = LocalDate.now();
+                        int calendarMonth = currentDate.getMonthOfYear();
+                        int calendarYear = currentDate.getYear();
+                        usersMonth.put(id, calendarMonth);
+                        usersYear.put(id, calendarYear);
+                        usersOrigin.put(id, db.getCode(oddr[1]));
+                        //origin = db.getCode(oddr[1]);
+                        usersDestination.put(id, db.getCode(oddr[2]));
+                        //destination = db.getCode(oddr[2]);
+                        usersCurrency.put(id, oddr[3]);
+                        //currency = oddr[3];
 //                        Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
 //                        r.seekCheapestFlight(conn, true);
 //                        outMessage.setText(r.reply);
                         try {
                             execute(CalendarUtil.sendInlineKeyBoardMessage(update.getMessage().getChatId(),
-                                    CalendarUtil.currentDate.getMonthOfYear(), CalendarUtil.currentDate.getYear()));
+                                    usersMonth.get(id), usersYear.get(id)));
                         }
                         catch (Exception e) {
                             e.printStackTrace();
@@ -142,17 +162,17 @@ public class Bot extends TelegramLongPollingBot {
                     }
                     execute(outMessage);
                 }
-                else if (oddr[0].equals("/calendar"))
-                {
-                    try {
-                        execute(CalendarUtil.sendInlineKeyBoardMessage(update.getMessage().getChatId(),
-                                CalendarUtil.currentDate.getMonthOfYear(), CalendarUtil.currentDate.getYear()));
-                        
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+//                else if (oddr[0].equals("/calendar"))
+//                {
+//                    try {
+//                        execute(CalendarUtil.sendInlineKeyBoardMessage(update.getMessage().getChatId(),
+//                                CalendarUtil.currentDate.getMonthOfYear(), CalendarUtil.currentDate.getYear()));
+//
+//                    }
+//                    catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
 
                 else {
                     outMessage.setText("I can't understand you.\nPlease use /help for check commands.");
@@ -161,38 +181,41 @@ public class Bot extends TelegramLongPollingBot {
             }
             else if (update.hasCallbackQuery())
             {
+                Long id = update.getCallbackQuery().getMessage().getChatId();
                 try {
                     if (!update.getCallbackQuery().getData().equals("nothing") &&
                               !update.getCallbackQuery().getData().equals("<") &&
                               !update.getCallbackQuery().getData().equals(">"))
                     {
                         Request r = new Request("http://api.travelpayouts.com/v1/prices/direct?",
-                                CalendarUtil.origin, CalendarUtil.destination,
+                                usersOrigin.get(id), usersDestination.get(id),
                                 update.getCallbackQuery().getData(),
-                                currency);
+                                usersCurrency.get(id));
                         execute(new SendMessage().setText(r.seekCheapestFlight()).setChatId(update.getCallbackQuery().getMessage().getChatId()));
                     }
                     else if (update.getCallbackQuery().getData().equals("<"))
                     {
-                        CalendarUtil.calendarMonth--;
-                        if (CalendarUtil.calendarMonth == 0)
+                        usersMonth.put(id, usersMonth.get(id) - 1);
+                        if (usersMonth.get(id) == 0)
                         {
-                            CalendarUtil.calendarYear--;
-                            CalendarUtil.calendarMonth = 12;
+//                            calendarYear--;
+//                            calendarMonth = 12;
+                            usersYear.put(id, usersYear.get(id) - 1);
+                            usersMonth.put(id, 12);
                         }
                         execute(CalendarUtil.sendInlineKeyBoardMessage(update.getCallbackQuery().getMessage().getChatId(),
-                                CalendarUtil.calendarMonth, CalendarUtil.calendarYear));
+                                usersMonth.get(id), usersYear.get(id)));
                     }
                     else if (update.getCallbackQuery().getData().equals(">"))
                     {
-                        CalendarUtil.calendarMonth++;
-                        if (CalendarUtil.calendarMonth == 13)
+                        usersMonth.put(id, usersMonth.get(id) + 1);
+                        if (usersMonth.get(id) == 13)
                         {
-                            CalendarUtil.calendarYear++;
-                            CalendarUtil.calendarMonth = 1;
+                            usersYear.put(id, usersYear.get(id) + 1);
+                            usersMonth.put(id, 1);
                         }
                         execute(CalendarUtil.sendInlineKeyBoardMessage(update.getCallbackQuery().getMessage().getChatId(),
-                                CalendarUtil.calendarMonth, CalendarUtil.calendarYear));
+                                usersMonth.get(id), usersYear.get(id)));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

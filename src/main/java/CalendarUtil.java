@@ -9,37 +9,36 @@ import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CalendarUtil
+class CalendarUtil
 {
+    private static String[] days = new String[] {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
 
-    static String[] days = new String[] {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+    private static String[] months = new String[] {"January","February","March","April","May","June","July","August","September","October","November","December"};
 
-    static  String[] months = new String[] {"January","February","March","April","May","June","July","August","September","October","November","December"};
+    private static int[] maxDays = new int[] {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    private static int[] visMaxDays = new int[] {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    static int[] maxDays = new int[] {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    static int[] visMaxDays = new int[] {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    private static LocalDate currentDate = LocalDate.now();
 
-    static LocalDate currentDate = LocalDate.now();
-
-    public static boolean visYear (int year)
+    private static boolean visYear(int year)
     {
         return year%4==0 && year%100 !=0 || year%400==0;
     }
 
-    public static List<String> origin = new ArrayList<>();
-    public static List<String> destination = new ArrayList<>();
+    //public static List<String> origin = new ArrayList<>();
+    //public static List<String> destination = new ArrayList<>();
 
-    public static int calendarMonth = currentDate.getMonthOfYear();
-    public static int calendarYear = currentDate.getYear();
+    //public static int calendarMonth = currentDate.getMonthOfYear();
+    //public static int calendarYear = currentDate.getYear();
 
-    public static SendMessage sendInlineKeyBoardMessage(long chatId, int month, int year)
+    static SendMessage sendInlineKeyBoardMessage(long chatId, int month, int year)
     {
         InlineKeyboardMarkup inlineKeyboardMarkup = CalendarUtil.createMonth(month, year, CalendarUtil.currentDate);
 
         return new SendMessage().setChatId(chatId).setText("Calendar").setReplyMarkup(inlineKeyboardMarkup);
     }
 
-    public static InlineKeyboardMarkup createMonth (int createdMonth, int createdYear, LocalDate date)
+    private static InlineKeyboardMarkup createMonth(int createdMonth, int createdYear, LocalDate date)
     {
         boolean isVis = visYear(createdYear);
         //int currentMonthDay = date.getDayOfMonth();
@@ -135,7 +134,7 @@ public class CalendarUtil
         return inlineKeyboardMarkup;
     }
 
-    public static String normFormat (int a)
+    private static String normFormat(int a)
     {
         if (a<10)
             return "0" + a;
