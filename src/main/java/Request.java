@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Request {
-    String des;
-    String reply;
-    List<String> origins;
-    List<String> destinations;
-    String date;
-    String currency;
-    String request_url;
+class Request {
+    private String des;
+    private String reply;
+    private List<String> origins;
+    private List<String> destinations;
+    private String date;
+    private String currency;
+    private String request_url;
     private String wrongInput = "Please, can you write your request right?\n" +
             "If you don't know how, you can use /seekCheapestFlight for check some example or read a documentation.";
     private String notFound = "Sorry, but there are no results for your search.\n" +
@@ -30,7 +30,7 @@ public class Request {
         request_url = url;
     }
 
-    String getHTTP(String urlToRead) throws Exception {
+    private String getHTTP(String urlToRead) throws Exception {
         StringBuilder result = new StringBuilder();
         URL url = new URL(urlToRead);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -46,7 +46,7 @@ public class Request {
 
     String seekCheapestFlight()
     {
-        int min = 1999999998;
+        int min = 1999999999;
         String minString = wrongInput;
         for (String o : origins){
             for (String d: destinations){
@@ -142,7 +142,7 @@ public class Request {
         return minString;
     }
 
-    int parserJSONCheapestFlight(String jsonCode) {
+    private int parserJSONCheapestFlight(String jsonCode) {
         JSONObject jsonObject = new JSONObject(jsonCode);
         boolean success = jsonObject.getBoolean("success");
         Object temp = jsonObject.get("data");
@@ -177,7 +177,7 @@ public class Request {
             e.printStackTrace();
             System.out.println("4");
             reply = notFound;
-            return 1999999999;
+            return 1999999998;
         }
     }
 }
