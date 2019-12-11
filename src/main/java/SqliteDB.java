@@ -254,7 +254,7 @@ public class SqliteDB {
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return new ArrayList<>();
         }
     }
 

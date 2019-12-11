@@ -59,31 +59,33 @@ public class Bot extends TelegramLongPollingBot {
 
                 if (inMessage.getText().equals("/help"))
                 {
-                    outMessage.setText("Bot to seek for cheap flights.\n"+
-                            "Commands: \n" + "/help\n/whatIsIATACode\n/seekCheapestFlight\n"
-                    + "/getCountMonth\n" + "/getCountDay\n" + "/getMostPopularInMonth\n" + "/getMostPopularInDay\n" + "/calendar\n");
+                    outMessage.setText("Just write two cities(with a capital letter), currency(EUR/USD/RUB), " +
+                            "select date in simple calendar and you get the " +
+                            "cheapest flight ticket from the first city to the second. \n" +
+                            "You can write both in English and in Russian, but currency strictly modeled(EUR/USD/RUB)."+
+                            "\nExamples:\nМосква Лондон RUB\nMoscow London USD");
                     execute(outMessage);
                 }
-                else if (inMessage.getText().equals("/whatIsIATACode")) {
-                    outMessage.setText("https://en.wikipedia.org/wiki/IATA_airport_code");
-                    execute(outMessage);
-                }
-                else if (inMessage.getText().equals("/seekCheapestFlight"))
-                {
-                    outMessage.setText("Seek cheapest flight in selected date.\n" +
-                            "First origin in format IATA-code,\n" +
-                            "second destination in format IATA-code,\n" +
-                            "third depart date in format YYYY-MM, \n" +
-                            "fourth return date in format YYYY-MM(optional),\n" +
-                            "fifth currency(you can choose from USD, EUR, RUB(standard), optional).\n" +
-                            "Example:\n" +
-                            "/seekCheapestFlight SVX MOW 2020-01 2020-02\n" +
-                            "/seekCheapestFlight SVX MOW 2020-01 2020-02 EUR\n" +
-                            "/seekCheapestFlight SVX MOW 2020-01\n" +
-                            "/seekCheapestFlight SVX MOW 2020-01 USD\n");
-                    execute(outMessage);
-                }
-                else if (oddr[0].equals("/seekCheapestFlight"))
+//                else if (inMessage.getText().equals("/whatIsIATACode")) {
+//                    outMessage.setText("https://en.wikipedia.org/wiki/IATA_airport_code");
+//                    execute(outMessage);
+//                }
+//                else if (inMessage.getText().equals("/seekCheapestFlight"))
+//                {
+//                    outMessage.setText("Seek cheapest flight in selected date.\n" +
+//                            "First origin in format IATA-code,\n" +
+//                            "second destination in format IATA-code,\n" +
+//                            "third depart date in format YYYY-MM, \n" +
+//                            "fourth return date in format YYYY-MM(optional),\n" +
+//                            "fifth currency(you can choose from USD, EUR, RUB(standard), optional).\n" +
+//                            "Example:\n" +
+//                            "/seekCheapestFlight SVX MOW 2020-01 2020-02\n" +
+//                            "/seekCheapestFlight SVX MOW 2020-01 2020-02 EUR\n" +
+//                            "/seekCheapestFlight SVX MOW 2020-01\n" +
+//                            "/seekCheapestFlight SVX MOW 2020-01 USD\n");
+//                    execute(outMessage);
+//                }
+                else if (oddr.length == 3)
                 {
                     SqliteDB db = new SqliteDB();
                     try {
@@ -92,11 +94,24 @@ public class Bot extends TelegramLongPollingBot {
                         int calendarYear = currentDate.getYear();
                         usersMonth.put(id, calendarMonth);
                         usersYear.put(id, calendarYear);
-                        usersOrigin.put(id, db.getCode(oddr[1]));
+                        usersOrigin.put(id, db.getCode(oddr[0]));
                         //origin = db.getCode(oddr[1]);
-                        usersDestination.put(id, db.getCode(oddr[2]));
+                        usersDestination.put(id, db.getCode(oddr[1]));
+                        usersCurrency.put(id, oddr[2]);
+                        if (usersOrigin.get(id).isEmpty() || usersDestination.get(id).isEmpty() ||
+                                (!usersCurrency.get(id).equals("RUB") && !usersCurrency.get(id).equals("EUR") &&
+                                        !usersCurrency.get(id).equals("USD")))
+                        {
+                            outMessage.setText("I can't understand you.\nMay be you request was incorrect.\n" +
+                                    "Just write two cities(with a capital letter), currency(EUR/USD/RUB), " +
+                                    "select date in simple calendar and you get the " +
+                                    "cheapest flight ticket from the first city to the second. \n" +
+                                    "You can write both in English and in Russian, but currency strictly modeled(EUR/USD/RUB)."+
+                                    "\nExamples:\nМосква Лондон RUB\nMoscow London USD");
+                            execute(outMessage);
+                            return;
+                        }
                         //destination = db.getCode(oddr[2]);
-                        usersCurrency.put(id, oddr[3]);
                         //currency = oddr[3];
 //                        Request r = new Request(oddr, "http://api.travelpayouts.com/v1/prices/direct?");
 //                        r.seekCheapestFlight(conn, true);
@@ -126,42 +141,42 @@ public class Bot extends TelegramLongPollingBot {
                         }
                     }
                 }
-                else if (oddr[0].equals("/getCountMonth"))
-                {
-                    try {
-                        outMessage.setText(String.valueOf(conn.GetCountMonth(oddr[1], oddr[2])));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    execute(outMessage);
-                }
-                else if (oddr[0].equals("/getCountDay"))
-                {
-                    try {
-                        outMessage.setText(String.valueOf(conn.GetCountDay(oddr[1], oddr[2])));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    execute(outMessage);
-                }
-                else if (oddr[0].equals("/getMostPopularInDay"))
-                {
-                    try {
-                        outMessage.setText(conn.getMostPopularInDay(oddr[1]));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    execute(outMessage);
-                }
-                else if (oddr[0].equals("/getMostPopularInMonth"))
-                {
-                    try {
-                        outMessage.setText(conn.getMostPopularInMonth(oddr[1]));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    execute(outMessage);
-                }
+//                else if (oddr[0].equals("/getCountMonth"))
+//                {
+//                    try {
+//                        outMessage.setText(String.valueOf(conn.GetCountMonth(oddr[1], oddr[2])));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    execute(outMessage);
+//                }
+//                else if (oddr[0].equals("/getCountDay"))
+//                {
+//                    try {
+//                        outMessage.setText(String.valueOf(conn.GetCountDay(oddr[1], oddr[2])));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    execute(outMessage);
+//                }
+//                else if (oddr[0].equals("/getMostPopularInDay"))
+//                {
+//                    try {
+//                        outMessage.setText(conn.getMostPopularInDay(oddr[1]));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    execute(outMessage);
+//                }
+//                else if (oddr[0].equals("/getMostPopularInMonth"))
+//                {
+//                    try {
+//                        outMessage.setText(conn.getMostPopularInMonth(oddr[1]));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    execute(outMessage);
+//                }
 //                else if (oddr[0].equals("/calendar"))
 //                {
 //                    try {
@@ -175,7 +190,12 @@ public class Bot extends TelegramLongPollingBot {
 //                }
 
                 else {
-                    outMessage.setText("I can't understand you.\nPlease use /help for check commands.");
+                    outMessage.setText("I can't understand you.\nMay be you request was incorrect.\n" +
+                            "Just write two cities(with a capital letter), currency(EUR/USD/RUB), " +
+                            "select date in simple calendar and you get the " +
+                            "cheapest flight ticket from the first city to the second. \n" +
+                            "You can write both in English and in Russian, but currency strictly modeled(EUR/USD/RUB)."+
+                            "\nExamples:\nМосква Лондон RUB\nMoscow London USD");
                     execute(outMessage);
                 }
             }
